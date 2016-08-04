@@ -28,7 +28,6 @@ namespace AHT_Buddy
         #region Remedy Codes : Class
         abstract class code : ObservableCollection<code>
         {
-       
             public static Dictionary<int, string> ProblemCode = new Dictionary<int, string>()
             {
                 {15003, "WG - No Internet - All" },
@@ -47,33 +46,66 @@ namespace AHT_Buddy
                 {14966, "WG - Intermittent Connectivity" },
                 {16176, "Stuck in Captive Portal" }
             };
-            public static Dictionary<int, string> CauseCode = new Dictionary<int, string>()
+            public static Dictionary<int, string> cc1500x = new Dictionary<int, string>()
             {
                 {165, "Customer Education" },
-                {1559, "Forgotten WiFi Password" },
+                {1559, "Forgot WiFi Password" },
                 {347, "Hardware/Software Failure or Configuration" },
                 {1083, "Customer Ticket Follow up" },
-                {825, "Truck Roll" },
-                {123, "Configuration Error" }
-
+                {825, "Truck Roll" }
             };
-            public static Dictionary<int, string> SolutionCode = new Dictionary<int, string>()
+            public static Dictionary<int, string> cc1126 = new Dictionary<int, string>()
             {
-                {2804,"Cx Education Hardware/Software" },
-                {6045, "Reconfig Wifi Security Setting" },
-                //347 Specific
-                { 6085, "Reset Modem/Powercycle Router" },
-                { 6041, "Factory Reset WG" },
-                { 9871, "Reset Cx Browser Settings" },
-                { 6067, "Reconfig Mobile Device Settings" },
-                //
-                {2901, "Appointment Cancelled by Phone" },
-                {9797, "Premise Truck Roll" },
-                {6092, "Toggle Bride Mode" },
-
-
+                {1559, "Forgot WiFi Password" },
+                {1083, "Customer Ticket Follow Up" },
+                {825, "Truck Roll" }
             };
-          
+            public static Dictionary<int, string> cc14179 = new Dictionary<int, string>()
+            {
+                {123, "Configuration Error" },
+                {1083, "Customer Ticket Follow Up" },
+                {825, "Truck Roll" }
+            };
+            public static Dictionary<int, string> cc15730 = new Dictionary<int, string>()
+            {
+                {1559, "Forgot WiFi Password" },
+                {1083, "Customer Ticket Follow Up" },
+            };
+            public static Dictionary<int, string> cc15731 = new Dictionary<int, string>()
+            {
+                {123, "Configuration Error" },
+                {1083, "Customer Ticket Follow Up" }
+            };
+            public static Dictionary<int, string> cc1129 = new Dictionary<int, string>()
+            {
+                {165, "Customer Education" },
+                {1559, "Forgot WiFi Password" },
+                {123, "Configuration Error" },
+                {1083, "Customer Ticket Follow Up" },
+                {825, "Truck Roll" }
+            };
+            public static Dictionary<int, string> cc1400x = new Dictionary<int, string>()
+            {
+                {165, "Customer Education" },
+                {347, "Hardware/Software Failure or Configuration" },
+                {1083, "Customer Ticket Follow Up" },
+                {825, "Truck Roll" }
+            };
+            public static Dictionary<int, string> SolutionCodes = new Dictionary<int, string>()
+            {
+                {2804, "Cx Education Hardware/Software" },
+                {6045, "Reconfig WiFi Security Settings" },
+                {6092, "Toggle Bridge Mode" },
+                {2901, "Cancelled by Phone" },
+                {9797, "Premise Truck Roll" }
+            };
+            public static Dictionary<int, string> sc347 = new Dictionary<int, string>()
+            {
+                {6085, "Power Cycle Modem" },
+                {6041, "Factory Reset WG" },
+                {9671, "Reset Browser Settings" },
+                {6067, "Reconfig Mobile Device" },
+            };
         }
         #endregion
 
@@ -81,9 +113,10 @@ namespace AHT_Buddy
         {
             this.InitializeComponent();
             abbCustomer.IsChecked = true;
-            comboPC.ItemsSource = code.ProblemCode;
+            comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
+            comboPC.SelectedValue = -1;
             
         }
 
@@ -95,124 +128,22 @@ namespace AHT_Buddy
         {
             NavigateBar.Visibility = Visibility.Collapsed;
         }
-        #region Load ComboBox Data
-        private void cc1500x()
+     
+        private void comboSC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[165]);
-            comboCC.Items.Add(code.CauseCode[1559]);
-            comboCC.Items.Add(code.CauseCode[347]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-            comboCC.Items.Add(code.CauseCode[825]);
-        }
-        private void cc1126()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[1559]);
-            comboCC.Items.Add(code.CauseCode[1803]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-        }
-        private void cc14179()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[123]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-            comboCC.Items.Add(code.CauseCode[825]);
-        }
-        private void cc15730()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[1559]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-        }
-        private void cc15731()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[123]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-        }
-        private void cc1129()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[165]);
-            comboCC.Items.Add(code.CauseCode[1559]);
-            comboCC.Items.Add(code.CauseCode[123]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-            comboCC.Items.Add(code.CauseCode[825]);
-        }
-        private void cc14xxx()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[165]);
-            comboCC.Items.Add(code.CauseCode[347]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-            comboCC.Items.Add(code.CauseCode[1559]);
-        }
-        private void cc16176()
-        {
-            comboCC.Items.Clear();
-            comboCC.Items.Add(code.CauseCode[347]);
-            comboCC.Items.Add(code.CauseCode[1083]);
-            comboCC.Items.Add(code.CauseCode[825]);
-        }
-        private void cc347()
-        {
-            comboSC.Items.Clear();
-            comboSC.Items.Add(code.SolutionCode[6085]);
-            comboSC.Items.Add(code.SolutionCode[6041]);
-            comboSC.Items.Add(code.SolutionCode[9871]);
-            comboSC.Items.Add(code.SolutionCode[6067]);
-        }
-        #endregion
-        #region ComboBox Selection Change
-        private void comboPC_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-            btnProblemCode.Content = comboPC.SelectedValue;
-
-            if (comboPC.SelectedValue.ToString() == "15003" ||
-                comboPC.SelectedValue.ToString() == "15002" ||
-                comboPC.SelectedValue.ToString() == "15001" ||
-                comboPC.SelectedValue.ToString() == "15006" ||
-                comboPC.SelectedValue.ToString() == "15005" ||
-                comboPC.SelectedValue.ToString() == "15004" ||
-                comboPC.SelectedValue.ToString() == "15567")
-            {
-                cc1500x();
-            }
-            else if (comboPC.SelectedValue.ToString() == "1126") { cc1126(); }
-            else if (comboPC.SelectedValue.ToString() == "14179") { cc14179(); }
-            else if (comboPC.SelectedValue.ToString() == "15730") { cc15730(); }
-            else if (comboPC.SelectedValue.ToString() == "15731") { cc15731(); }
-            else if (comboPC.SelectedValue.ToString() == "1129") { cc1129(); }
-            else if (comboPC.SelectedValue.ToString() == "14194" || comboPC.SelectedValue.ToString() == "14968") { cc14xxx(); }
-            else if (comboPC.SelectedValue.ToString() == "16176") { cc16176};
+            btnSolutionCode.Content = comboSC.SelectedValue;
         }
 
-        private void comboCC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void btnProblemCode_Click(object sender, RoutedEventArgs e)
         {
-            if(comboCC.SelectedIndex == -1) { return; }
-            else { btnCauseCode.Content = comboCC.SelectedValue; }
-
-            if (comboCC.SelectedValue.ToString() == "165")
-            {
-                comboSC.Items.Clear();
-                comboSC.Items.Add(code.SolutionCode[2804]);
-                comboSC.SelectedIndex = 0;
-            }
-            else if (comboCC.SelectedValue.ToString() == "1559")
-            {
-                comboSC.Items.Clear();
-                comboSC.Items.Add(code.SolutionCode[6045]);
-                comboSC.SelectedIndex = 0;
-            }
-            else if (comboCC.SelectedValue.ToString() == "347")
-            {
-                comboSC.Items.Clear();
-                comboSC.Items.Add(code.SolutionCode[6085]);
-                comboSC.Items
-            }
+            
         }
-        #endregion
+
+        private void btnCauseCode_Click(object sender, RoutedEventArgs e)
+        {
+            comboPC.ItemsSource = code.CauseCode;
+            comboPC.DisplayMemberPath = "Value";
+            comboPC.SelectedValuePath = "Key";
+        }
     }
 }
