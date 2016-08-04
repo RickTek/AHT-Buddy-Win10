@@ -34,7 +34,7 @@ namespace AHT_Buddy
                 {15002, "WG - No Internet - Multiple" },
                 {15001, "WG - No Internet - Single" },
                 {1126, "WG - Login/PW Issues" },
-                {15006, "WiFi - No Connection - All" },                
+                {15006, "WiFi - No Connection - All" },
                 {15005, "WiFi - No Connection - Multiple" },
                 {15004, "WiFi - No Connection - Single" },
                 {14179, "WG - Bridge Mode Toggle" },
@@ -91,14 +91,27 @@ namespace AHT_Buddy
                 {1083, "Customer Ticket Follow Up" },
                 {825, "Truck Roll" }
             };
-            public static Dictionary<int, string> SolutionCodes = new Dictionary<int, string>()
+            public static Dictionary<int, string> sc2804 = new Dictionary<int, string>()
             {
-                {2804, "Cx Education Hardware/Software" },
-                {6045, "Reconfig WiFi Security Settings" },
-                {6092, "Toggle Bridge Mode" },
-                {2901, "Cancelled by Phone" },
+                {2804, "Cx Education Hardware/Software" }                
+            };
+            public static Dictionary<int, string> sc6045 = new Dictionary<int, string>()
+            {
+                {6045, "Reconfig WiFi Security Settings" }
+            };
+            public static Dictionary<int, string> sc6092 = new Dictionary<int, string>()
+            {
+                {6092, "Toggle Bridge Mode" }
+            };
+            public static Dictionary<int, string> sc2901 = new Dictionary<int, string>()
+            {
+                {2901, "Cancelled by Phone" }
+            };
+            public static Dictionary<int, string> sc9797 = new Dictionary<int, string>()
+            {
                 {9797, "Premise Truck Roll" }
             };
+            
             public static Dictionary<int, string> sc347 = new Dictionary<int, string>()
             {
                 {6085, "Power Cycle Modem" },
@@ -116,8 +129,11 @@ namespace AHT_Buddy
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
+            comboCC.DisplayMemberPath = "Value";
+            comboCC.SelectedValuePath = "Key";
+            comboSC.DisplayMemberPath = "Value";
+            comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
-            
         }
 
         private void AppBar_Opening(object sender, object e)
@@ -128,22 +144,156 @@ namespace AHT_Buddy
         {
             NavigateBar.Visibility = Visibility.Collapsed;
         }
-     
-        private void comboSC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        #region Problem Code Combo Box Selection Changed
+        private void comboPC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if(comboPC.SelectedIndex == -1) { return; }
+            
+            
+            if (comboPC.SelectedValue.ToString() == "15003" ||
+               comboPC.SelectedValue.ToString() == "15002" ||
+               comboPC.SelectedValue.ToString() == "15001" ||
+               comboPC.SelectedValue.ToString() == "15006" ||
+               comboPC.SelectedValue.ToString() == "15005" ||
+               comboPC.SelectedValue.ToString() == "15004" ||
+               comboPC.SelectedValue.ToString() == "15567")
+            {
+                if (comboCC.ItemsSource != code.cc1500x)
+                {
+                    comboCC.ItemsSource = code.cc1500x;
+                }
+                else { return; }
+             }
+             else if(comboPC.SelectedValue.ToString() == "1126")
+            {
+                if(comboCC.ItemsSource != code.cc1126)
+                {
+                    comboCC.ItemsSource = code.cc1126;
+                }
+                else { return; }
+            }
+            else if(comboPC.SelectedValue.ToString() == "14179")
+            {
+                if(comboCC.ItemsSource != code.cc14179)
+                {
+                    comboCC.ItemsSource = code.cc14179;
+                }
+                else { return; }
+            }
+            else if(comboPC.SelectedValue.ToString() == "15730")
+            {
+                if(comboCC.ItemsSource != code.cc15730)
+                {
+                    comboCC.ItemsSource = code.cc15730;
+                }
+                else { return; }
+            }
+            else if (comboPC.SelectedValue.ToString() == "15731")
+            {
+                if(comboCC.ItemsSource != code.cc15731)
+                {
+                    comboCC.ItemsSource = code.cc15731;
+                }
+                else { return; }
+            }
+            else if(comboPC.SelectedValue.ToString() == "1129")
+            {
+                if(comboCC.ItemsSource != code.cc1129)
+                {
+                    comboCC.ItemsSource = code.cc1126;
+                }
+                else { return; }
+            }
+            else if(comboPC.SelectedValue.ToString() == "14194" || comboPC.SelectedValue.ToString() == "14966")
+            {
+                if(comboCC.ItemsSource != code.cc1400x)
+                {
+                    comboCC.ItemsSource = code.cc1400x;
+                }
+                else { return; }
+            }
+            btnProblemCode.Content = comboPC.SelectedValue;
+        }
+        #endregion
+        #region Cause Code Combox Selection Changed
+        private void comboCC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+           if(comboCC.SelectedIndex == -1) { return; }
+
+            if(comboCC.SelectedValue.ToString() == "165")
+            {
+                if(comboSC.ItemsSource != code.sc2804)
+                {
+                    comboSC.ItemsSource = code.sc2804;
+                    comboSC.SelectedIndex = 0;
+                }
+                else { return; }
+            }
+            else if(comboCC.SelectedValue.ToString() == "1559")
+            {
+                if(comboSC.ItemsSource != code.sc6045)
+                {
+                    comboSC.ItemsSource = code.sc6045;
+                    comboSC.SelectedIndex = 0;
+                }
+                else { return; }
+            }
+            else if(comboCC.SelectedValue.ToString() == "347")
+            {
+                if(comboSC.ItemsSource != code.sc347)
+                {
+                    comboSC.ItemsSource = code.sc347;
+                    comboSC.SelectedIndex = 0;
+                }
+                else { return; }
+            }
+            else if(comboCC.SelectedValue.ToString() == "1083")
+            {
+                if (comboSC.ItemsSource != code.sc2901)
+                {
+                    comboSC.ItemsSource = code.sc2901;
+                    comboSC.SelectedIndex = 0;
+                }
+                else { return; }
+            }
+            else if(comboCC.SelectedValue.ToString() == "825")
+            {
+                if(comboSC.ItemsSource != code.sc9797)
+                {
+                    comboSC.ItemsSource = code.sc9797;
+                    comboSC.SelectedIndex = 0;
+                }
+                else { return; }
+            }
+            else if(comboCC.SelectedValue.ToString() == "123")
+            {
+                if(comboSC.ItemsSource != code.sc6045)
+                {
+                    comboSC.ItemsSource = code.sc6045;
+                    comboSC.SelectedIndex = 0;
+                }
+                else if(comboPC.SelectedValue.ToString() == "14179")
+                {
+                    if(comboSC.ItemsSource != code.sc6092)
+                    {
+                        comboSC.ItemsSource = code.sc6092;
+                        comboSC.SelectedIndex = 0;
+                    }
+                    else { return; }
+                }
+                else { return; }
+            }
+            btnCauseCode.Content = comboCC.SelectedValue;
             btnSolutionCode.Content = comboSC.SelectedValue;
         }
-
-        private void btnProblemCode_Click(object sender, RoutedEventArgs e)
+        #endregion
+        #region Solution Code Combo Box Selection Changed
+        private void comboSC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
-        }
+            if(comboSC.SelectedIndex == -1) { return; }
+            btnSolutionCode.Content = comboSC.SelectedValue;
 
-        private void btnCauseCode_Click(object sender, RoutedEventArgs e)
-        {
-            comboPC.ItemsSource = code.CauseCode;
-            comboPC.DisplayMemberPath = "Value";
-            comboPC.SelectedValuePath = "Key";
         }
+        #endregion
     }
 }

@@ -838,20 +838,20 @@
                 <Button x:Name="btnNextCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
                 <CheckBox x:Name="cbChronic" Content="Chronic?" HorizontalAlignment="Left" Height="25" Margin="204,0,0,0" VerticalAlignment="Top" Width="100" MinWidth="0" MinHeight="30" Foreground="#FF787878" Style="{StaticResource CheckBoxStyle1}"/>
             </Grid>
-            <Button x:Name="btnProblemCode" Content="Problem Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="13,356,0,-356" FontSize="11" Click="btnProblemCode_Click">
+            <Button x:Name="btnProblemCode" Content="Problem Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="13,356,0,-356" FontSize="11">
                 <Button.Flyout>
                     <Flyout x:Name="flyProblemCode">
                         <Viewbox x:Name="vbProblemCode" Margin="0">
-                            <ComboBox x:Name="comboPC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Problem Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}"/>
+                            <ComboBox x:Name="comboPC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Problem Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboPC_SelectionChanged"/>
                         </Viewbox>
                     </Flyout>
                 </Button.Flyout>
             </Button>
-            <Button x:Name="btnCauseCode" Content="Cause Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="80" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="100,356,-87,-356" FontSize="11" Click="btnCauseCode_Click">
+            <Button x:Name="btnCauseCode" Content="Cause Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="80" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="100,356,-87,-356" FontSize="11">
                 <Button.Flyout>
                     <Flyout>
                         <Viewbox>
-                            <ComboBox x:Name="comboCC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Cause Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" />
+                            <ComboBox x:Name="comboCC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Cause Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboCC_SelectionChanged" />
                         </Viewbox>
                     </Flyout>
                 </Button.Flyout>
@@ -860,7 +860,7 @@
                 <Button.Flyout>
                     <Flyout>
                         <Viewbox x:Name="vbSolutionCode">
-                            <ComboBox x:Name="comboSC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Solution Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}"/>
+                            <ComboBox x:Name="comboSC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Solution Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboSC_SelectionChanged"/>
                         </Viewbox>
                     </Flyout>
                 </Button.Flyout>
