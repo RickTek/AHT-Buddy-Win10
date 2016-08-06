@@ -170,6 +170,7 @@ namespace AHT_Buddy
             public string Next { get; set; }
             public string Attempt { get; set; }
             public bool Chronic { get; set; }
+            public DateTime TimeStamp { get; set; }
         }
 
 
@@ -371,7 +372,9 @@ namespace AHT_Buddy
                 Resolution = tbResolution.Text,
                 Next = tbNext.Text,
                 Attempt = tbAttempt.Text,
-                Chronic = cbChronic.IsChecked.Value
+                Chronic = cbChronic.IsChecked.Value,
+                TimeStamp = DateTime.Now
+                
             });
             
         }
