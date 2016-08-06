@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -14,6 +16,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 using System.Collections;
+using SQLite.Net;
+using SQLite.Net.Attributes;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -150,11 +154,11 @@ namespace AHT_Buddy
         }
         #endregion
         #region Call Data : Class
-        public class cxData : ObservableCollection<cxData>
+        public class Customer
         {
-            
-            private Dictionary<int, string[]> cx = new Dictionary<int, string[]>();
-            
+
+           [PrimaryKey, AutoIncrement]
+            public int Id { get; set; }
             public string Email { get; set; }
             public string Ticket { get; set; }
             public string Name { get; set; }
@@ -165,25 +169,27 @@ namespace AHT_Buddy
             public string Resolution { get; set; }
             public string Next { get; set; }
             public string Attempt { get; set; }
-            public string Chronic { get; set; }
-
-            public int CallNum { get; set; }
-
-            public void SaveCall ()
-            {                
-                string[] CallData = new string[11] { Email, Ticket, Name, Account, Contact, Device, Issue, Resolution, Next, Attempt, Chronic };
-                cx.Add(CallNum, CallData);                
-            }  
-                               
+            public bool Chronic { get; set; }
         }
+
+
+
+
         #endregion
 
-        public cxData Customer = new cxData();
-        public int CallCount;
+        string path;
+        SQLite.Net.SQLiteConnection conn;
+
+
+        //public cxData Customer = new cxData();
+        //public int CallCount;
         public MainPage()
         {
             this.InitializeComponent();
-            
+            path = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "CallData.sqlite");
+            SQLite.Net.SQLiteConnection conn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), path);
+            conn.CreateTable<Customer>();
+
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
@@ -192,6 +198,10 @@ namespace AHT_Buddy
             comboSC.DisplayMemberPath = "Value";
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
+
+            
+           
+            
             
         }
         #region Remedy Code Operations
@@ -349,19 +359,21 @@ namespace AHT_Buddy
         #region Call Operations
         private void SaveCallData()
         {
-            Customer.Email = tbEmail.Text;
-            Customer.Ticket = tbTicket.Text;
-            Customer.Name = tbCustomer.Text;
-            Customer.Account = tbAccount.Text;
-            Customer.Contact = tbContact.Text;
-            Customer.Device = tbAffected.Text;
-            Customer.Issue = tbIssue.Text;
-            Customer.Resolution = tbResolution.Text;
-            Customer.Next = tbNext.Text;
-            Customer.Attempt = tbAttempt.Text;
-            if(cbChronic.IsChecked == true){ Customer.Chronic = "y"; } else { Customer.Chronic = "n"; }
-            Customer.CallNum = CallCount;
-            Customer.SaveCall();
+            conn.Insert(new Customer()
+            {
+                Email = tbEmail.Text,
+                Ticket = tbTicket.Text,
+                Name = tbCustomer.Text,
+                Account = tbAccount.Text,
+                Contact = tbContact.Text,
+                Device = tbDevice.Text,
+                Issue = tbIssue.Text,
+                Resolution = tbResolution.Text,
+                Next = tbNext.Text,
+                Attempt = tbAttempt.Text,
+                Chronic = cbChronic.IsChecked.Value
+            });
+            
         }
         private void abbNewCall_Click(object sender, RoutedEventArgs e)
         {
@@ -370,7 +382,7 @@ namespace AHT_Buddy
                 string.IsNullOrEmpty(tbCustomer.Text) &&
                 string.IsNullOrEmpty(tbAccount.Text) &&
                 string.IsNullOrEmpty(tbContact.Text) &&
-                string.IsNullOrEmpty(tbAffected.Text) &&
+                string.IsNullOrEmpty(tbDevice.Text) &&
                 string.IsNullOrEmpty(tbIssue.Text) &&
                 string.IsNullOrEmpty(tbResolution.Text))
             {
@@ -378,7 +390,6 @@ namespace AHT_Buddy
             }
             else
             {
-                CallCount++;
                 SaveCallData();
             }
         }

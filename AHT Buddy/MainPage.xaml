@@ -1039,7 +1039,7 @@
                     </Grid>
                     <Grid x:Name="Device_Grid" Margin="13,220,-1,0">
                         <TextBox x:Name="tbAttempt"  Height="30" Margin="205,0,-83,0" Style="{StaticResource TextBoxStyle1}" MinHeight="30" MaxHeight="30" MinWidth="90" MaxWidth="90" Padding="5,2" PlaceholderText="Attempt #" TabIndex="6" VerticalAlignment="Top"/>
-                        <TextBox x:Name="tbAffected" Height="30" Width="Auto" PlaceholderText="Affected Device" Margin="0,0,12,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="5" VerticalAlignment="Top"/>
+                        <TextBox x:Name="tbDevice" Height="30" Width="Auto" PlaceholderText="Affected Device" Margin="0,0,12,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="5" VerticalAlignment="Top"/>
                         <Button x:Name="btnDeviceCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
                     </Grid>
                     <Grid x:Name="Issue_Grid" Margin="10,255,0,30">
@@ -1179,7 +1179,7 @@
             <PivotItem x:Name="Alarms" Margin="0,-15,0,0">
                 <PivotItem.Header>
                     <Grid Height="32" Width="45" Margin="-8,-14,0,0">
-                        <SymbolIcon Symbol="Clock"  Margin="0,1,0,9" RenderTransformOrigin="0.5,0.5">
+                        <SymbolIcon Symbol="Clock"  Margin="-2,1,15,9" RenderTransformOrigin="0.5,0.5">
                             <SymbolIcon.RenderTransform>
                                 <CompositeTransform ScaleX="0.75" ScaleY="0.75"/>
                             </SymbolIcon.RenderTransform>
