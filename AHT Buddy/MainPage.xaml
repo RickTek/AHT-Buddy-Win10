@@ -5,7 +5,8 @@
     xmlns:local="using:AHT_Buddy"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Width="315" Height="465">
+    mc:Ignorable="d" Width="315" Height="480">
+    
 
     <Page.Resources>
         <SolidColorBrush x:Key="CustomButtonHighlight" Color="LightGreen"/>
@@ -762,109 +763,434 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="HubSectionStyle1" TargetType="HubSection">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="Padding" Value="12,10,12,0"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="UseSystemFocusVisuals" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="HubSection">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                            <Border.Resources>
+                                <ControlTemplate x:Key="HeaderButtonTemplate" TargetType="Button">
+                                    <Grid x:Name="ButtonRoot" Background="Transparent">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal">
+                                                    <Storyboard>
+                                                        <PointerUpThemeAnimation Storyboard.TargetName="ButtonRoot"/>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="PointerOver">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHyperlinkBaseMediumBrush}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <PointerUpThemeAnimation Storyboard.TargetName="ButtonRoot"/>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Pressed">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightBaseMediumLowBrush}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                        <PointerDownThemeAnimation Storyboard.TargetName="ButtonRoot"/>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="ImitatedTextBlock">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlPageTextBaseHighBrush}"/>
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" OpticalMarginAlignment="TrimSideBearings" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Border.Resources>
+                            <Grid HorizontalAlignment="Stretch" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Rectangle x:Name="HubHeaderPlaceholder" Grid.Row="0"/>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="HeaderButton" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="0" Foreground="{ThemeResource SystemControlHyperlinkTextBrush}" FontWeight="{ThemeResource HubSectionHeaderThemeFontWeight}" FontSize="{ThemeResource HubSectionHeaderThemeFontSize}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="False" IsTabStop="False" Margin="{ThemeResource HubSectionHeaderThemeMargin}" Grid.Row="1" Template="{StaticResource HeaderButtonTemplate}" UseSystemFocusVisuals="True" VerticalAlignment="Bottom"/>
+                                    <Button x:Name="SeeMoreButton" Grid.Column="1" Foreground="{ThemeResource SystemControlHyperlinkTextBrush}" FontWeight="{ThemeResource HubSectionHeaderThemeFontWeight}" FontSize="{ThemeResource HubSectionHeaderSeeMoreThemeFontSize}" HorizontalAlignment="Right" Margin="{ThemeResource HubSectionHeaderSeeMoreThemeMargin}" Grid.Row="1" Template="{StaticResource HeaderButtonTemplate}" UseSystemFocusVisuals="True" Visibility="Collapsed" VerticalAlignment="Bottom"/>
+                                </Grid>
+                                <ContentPresenter x:Name="ContentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Grid.Row="2" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PivotItemStyle1" TargetType="PivotItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="{ThemeResource PivotItemMargin}"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PivotItem">
+                        <Grid Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="Pivot">
+                                    <VisualState x:Name="Right"/>
+                                    <VisualState x:Name="Left"/>
+                                    <VisualState x:Name="Center"/>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ButtonStyle2" TargetType="Button">
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundTransparentBrush}"/>
+            <Setter Property="BorderThickness" Value="{ThemeResource ButtonBorderThemeThickness}"/>
+            <Setter Property="Padding" Value="8,4,8,4"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+            <Setter Property="UseSystemFocusVisuals" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="10" BorderBrush="DarkGray">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightBaseMediumLowBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource CustomButtonHighlight}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="RootGrid">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource CustomButtonClick}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightTransparentBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightBaseHighBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+
+                                            <PointerDownThemeAnimation Storyboard.TargetName="RootGrid"/>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="RootGrid">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledBaseMediumLowBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="ContentPresenter">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlDisabledTransparentBrush}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter x:Name="ContentPresenter" AutomationProperties.AccessibilityView="Raw" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" CornerRadius="10" Height="Auto" Width="Auto">
+                                <SymbolIcon x:Name="copy" Symbol="Add" Margin="-3,-6" Foreground="{TemplateBinding BorderBrush}"/>
+
+                            </ContentPresenter>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ListBoxStyle1" TargetType="ListBox">
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+            <Setter Property="BorderThickness" Value="{ThemeResource ListBoxBorderThemeThickness}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled"/>
+            <Setter Property="ScrollViewer.IsHorizontalRailEnabled" Value="True"/>
+            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Enabled"/>
+            <Setter Property="ScrollViewer.IsVerticalRailEnabled" Value="True"/>
+            <Setter Property="ScrollViewer.ZoomMode" Value="Disabled"/>
+            <Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="False"/>
+            <Setter Property="ScrollViewer.BringIntoViewOnFocusChange" Value="True"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="TabNavigation" Value="Once"/>
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBox">
+                        <Border x:Name="LayoutRoot" BorderBrush="#FF7A7A7A" BorderThickness="2" Background="{TemplateBinding Background}" CornerRadius="10">
+                            <ScrollViewer x:Name="ScrollViewer" AutomationProperties.AccessibilityView="Raw" BringIntoViewOnFocusChange="{TemplateBinding ScrollViewer.BringIntoViewOnFocusChange}" HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}" IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}" IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}" Padding="{TemplateBinding Padding}" TabNavigation="{TemplateBinding TabNavigation}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}" ZoomMode="{TemplateBinding ScrollViewer.ZoomMode}">
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </Page.Resources>
     <Page.BottomAppBar>
-        <CommandBar/>
+        <CommandBar>
+            <CommandBar.SecondaryCommands>
+
+                <AppBarButton x:Name="Exit" Icon="Cancel" Label="Exit App"/>
+            </CommandBar.SecondaryCommands>
+            <CommandBar.Content>
+                <Grid/>
+            </CommandBar.Content>
+            <AppBarButton x:Name="prevCall" Label="Previous Call" Icon="Previous"/>
+            <AppBarButton x:Name="abbNextCall" Label="NextCall" Icon="Next"/>
+            <AppBarButton x:Name="abbNewCall" Label="New Call" Icon="Phone" Click="abbNewCall_Click"/>
+            <AppBarButton x:Name="abbPoDcopy" Label="Copy PoD" Icon="Rename"/>
+
+        </CommandBar>
     </Page.BottomAppBar>
+
     <Grid x:Name="Main_Grid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <AppBar x:Name="TopAppBar" Height="Auto" Width="Auto" Opening="AppBar_Opening" Margin="0,0,-1,0">
-            <StackPanel x:Name="NavigateBar" Orientation="Horizontal" Visibility="Collapsed">
-                <AppBarToggleButton x:Name="abbCustomer" Label="Customer" Icon="ContactInfo"/>
-                <AppBarToggleButton x:Name="abbPoDs" Label="PoDs" Icon="Rename"/>
-                <AppBarToggleButton x:Name="abbDictionary" Label="Dictionary" Icon="Library"/>
-                <AppBarToggleButton x:Name="abbAlarms"  Icon="Clock" Label="Alarms"/>
-            </StackPanel>
-        </AppBar>
-        <RelativePanel x:Name="CustomerData" Margin="0,25,0,0">
-            <ComboBox x:Name="comboWG" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="160" PlaceholderText="Wireless Gateway" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}">
-                <ComboBoxItem x:Name="Technicolor" Content="Technicolor" Padding="5,0,0,0"/>
-                <ComboBoxItem x:Name="Arris" Content="Arris" Padding="5,0,0,0"/>
-                <ComboBoxItem x:Name="Cisco" Content="Cisco" Padding="5,0,0,0"/>
-                <ComboBoxItem x:Name="Dory" Content="SMC Dory" Padding="5,0,0,0"/>
-                <ComboBoxItem x:Name="SMC" Content="SMC" Padding="5,0,0,0"/>
-            </ComboBox>
-            <Grid x:Name="Email_Grid" Margin="10,45,0,0">
-                <TextBox x:Name="tbEmail" Height="30" Width="Auto" PlaceholderText="Customer Email Address" Margin="0,0,10,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-                <Button x:Name="btnEmailCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Ticket_Grid" Margin="11,80,9,0">
-                <TextBox x:Name="tbTicket" Height="30" Width="Auto" PlaceholderText="Ticket Number" Margin="0,0,5,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="1" VerticalAlignment="Top" AutomationProperties.LandmarkType="Search"/>
-                <Button x:Name="btnTicketCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Customer_Grid" Margin="10,115,0,0">
-                <TextBox x:Name="tbCustomer" Height="30" Width="Auto" PlaceholderText="Customer Name" Margin="0,0,10,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="2" VerticalAlignment="Top"/>
-                <Button x:Name="btnCustomerCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Account_Grid" Margin="10,150,10,0">
-                <TextBox x:Name="tbAccount" Height="30" Width="Auto" PlaceholderText="Account Number" Margin="0,0,5,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="3" VerticalAlignment="Top"/>
-                <Button x:Name="btnAccountCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Contact_Grid" Margin="11,185,0,0">
-                <TextBox x:Name="tbContact" Height="30" Width="Auto" PlaceholderText="Contact Number" Margin="0,0,11,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="4" VerticalAlignment="Top"/>
-                <Button x:Name="btnContactCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Device_Grid" Margin="13,220,-1,0">
-                <TextBox x:Name="tbAttempt"  Height="30" Margin="205,0,-83,0" Style="{StaticResource TextBoxStyle1}" MinHeight="30" MaxHeight="30" MinWidth="90" MaxWidth="90" Padding="5,2" PlaceholderText="Attempt #" TabIndex="6" VerticalAlignment="Top"/>
-                <TextBox x:Name="tbAffected" Height="30" Width="Auto" PlaceholderText="Affected Device" Margin="0,0,12,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="5" VerticalAlignment="Top"/>
-                <Button x:Name="btnDeviceCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Issue_Grid" Margin="10,255,0,30">
-                <Button x:Name="btnIssue_FlyOut" Content="Reported Issue" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="298" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8">
-                    <Button.Flyout>
-                        <Flyout>
-                            <Viewbox>
-                                <TextBox x:Name="tbIssue" Margin="3,0,0,0" TextWrapping="Wrap" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Reported Issue"/>
-                            </Viewbox>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-                <Button x:Name="btnIssueCopy" Content="Button" HorizontalAlignment="Left" Height="28" Margin="265,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Resolution_Grid" Margin="10,288,0,30">
-                <Button x:Name="btnResolution_FlyOut" Content="Identify &amp; Resolve" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="298" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8">
-                    <Button.Flyout>
-                        <Flyout>
-                            <Viewbox>
-                                <TextBox x:Name="tbResolution" Margin="3,0,0,0" TextWrapping="Wrap" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Identify &amp; Resolve"/>
-                            </Viewbox>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-                <Button x:Name="btnResoultion" Content="Button" HorizontalAlignment="Left" Height="28" Margin="265,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-            </Grid>
-            <Grid x:Name="Next_Grid" Margin="13,321,0,0">
-                <TextBox x:Name="tbNext" Height="30" Width="Auto" PlaceholderText="Next Action" Margin="-1,0,103,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="4" VerticalAlignment="Top"/>
-                <Button x:Name="btnNextCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
-                <CheckBox x:Name="cbChronic" Content="Chronic?" HorizontalAlignment="Left" Height="25" Margin="204,0,0,0" VerticalAlignment="Top" Width="100" MinWidth="0" MinHeight="30" Foreground="#FF787878" Style="{StaticResource CheckBoxStyle1}"/>
-            </Grid>
-            <Button x:Name="btnProblemCode" Content="Problem Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="13,356,0,-356" FontSize="11">
-                <Button.Flyout>
-                    <Flyout x:Name="flyProblemCode">
-                        <Viewbox x:Name="vbProblemCode" Margin="0">
-                            <ComboBox x:Name="comboPC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Problem Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboPC_SelectionChanged"/>
-                        </Viewbox>
-                    </Flyout>
-                </Button.Flyout>
-            </Button>
-            <Button x:Name="btnCauseCode" Content="Cause Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="80" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="100,356,-87,-356" FontSize="11">
-                <Button.Flyout>
-                    <Flyout>
-                        <Viewbox>
-                            <ComboBox x:Name="comboCC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Cause Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboCC_SelectionChanged" />
-                        </Viewbox>
-                    </Flyout>
-                </Button.Flyout>
-            </Button>
-            <Button x:Name="btnSolutionCode" Content="Solution Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="185,356,-172,-356" FontSize="11">
-                <Button.Flyout>
-                    <Flyout>
-                        <Viewbox x:Name="vbSolutionCode">
-                            <ComboBox x:Name="comboSC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Solution Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboSC_SelectionChanged"/>
-                        </Viewbox>
-                    </Flyout>
-                </Button.Flyout>
-            </Button>
-        </RelativePanel>
+        <Pivot>
+            <PivotItem x:Name="Cx" Margin="0,-15,0,0" Style="{StaticResource PivotItemStyle1}" FontSize="11">
+                <PivotItem.Header>
+                    <Grid Height="32" Width="45" Margin="-8,-14,0,0">
+                        <SymbolIcon Symbol="Contact"  Margin="0,1,0,9" RenderTransformOrigin="0.5,0.5">
+                            <SymbolIcon.RenderTransform>
+                                <CompositeTransform ScaleX="0.75" ScaleY="0.75"/>
+                            </SymbolIcon.RenderTransform>
+                        </SymbolIcon>
+                        <TextBlock Text="Customer" FontSize="10" Margin="0,17,0,0"/>
+                    </Grid>
+                </PivotItem.Header>
+                <RelativePanel x:Name="CustomerData">
+                    <ComboBox x:Name="comboWG" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="160" PlaceholderText="Wireless Gateway" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}">
+                        <ComboBoxItem x:Name="Technicolor" Content="Technicolor" Padding="5,0,0,0"/>
+                        <ComboBoxItem x:Name="Arris" Content="Arris" Padding="5,0,0,0"/>
+                        <ComboBoxItem x:Name="Cisco" Content="Cisco" Padding="5,0,0,0"/>
+                        <ComboBoxItem x:Name="Dory" Content="SMC Dory" Padding="5,0,0,0"/>
+                        <ComboBoxItem x:Name="SMC" Content="SMC" Padding="5,0,0,0"/>
+                    </ComboBox>
+                    <Grid x:Name="Email_Grid" Margin="10,45,0,0">
+                        <TextBox x:Name="tbEmail" Height="30" Width="Auto" PlaceholderText="Customer Email Address" Margin="0,0,10,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                        <Button x:Name="btnEmailCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Ticket_Grid" Margin="11,80,9,0">
+                        <TextBox x:Name="tbTicket" Height="30" Width="Auto" PlaceholderText="Ticket Number" Margin="0,0,5,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="1" VerticalAlignment="Top" AutomationProperties.LandmarkType="Search"/>
+                        <Button x:Name="btnTicketCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Customer_Grid" Margin="10,115,0,0">
+                        <TextBox x:Name="tbCustomer" Height="30" Width="Auto" PlaceholderText="Customer Name" Margin="0,0,10,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="2" VerticalAlignment="Top"/>
+                        <Button x:Name="btnCustomerCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Account_Grid" Margin="10,150,10,0">
+                        <TextBox x:Name="tbAccount" Height="30" Width="Auto" PlaceholderText="Account Number" Margin="0,0,5,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="3" VerticalAlignment="Top"/>
+                        <Button x:Name="btnAccountCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Contact_Grid" Margin="11,185,0,0">
+                        <TextBox x:Name="tbContact" Height="30" Width="Auto" PlaceholderText="Contact Number" Margin="0,0,11,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="4" VerticalAlignment="Top"/>
+                        <Button x:Name="btnContactCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="262,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Device_Grid" Margin="13,220,-1,0">
+                        <TextBox x:Name="tbAttempt"  Height="30" Margin="205,0,-83,0" Style="{StaticResource TextBoxStyle1}" MinHeight="30" MaxHeight="30" MinWidth="90" MaxWidth="90" Padding="5,2" PlaceholderText="Attempt #" TabIndex="6" VerticalAlignment="Top"/>
+                        <TextBox x:Name="tbAffected" Height="30" Width="Auto" PlaceholderText="Affected Device" Margin="0,0,12,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="5" VerticalAlignment="Top"/>
+                        <Button x:Name="btnDeviceCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Issue_Grid" Margin="10,255,0,30">
+                        <Button x:Name="btnIssue_FlyOut" Content="Reported Issue" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="298" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8">
+                            <Button.Flyout>
+                                <Flyout>
+                                    <Viewbox>
+                                        <TextBox x:Name="tbIssue" Margin="3,0,0,0" TextWrapping="Wrap" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Reported Issue"/>
+                                    </Viewbox>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Button x:Name="btnIssueCopy" Content="Button" HorizontalAlignment="Left" Height="28" Margin="265,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Resolution_Grid" Margin="10,288,0,30">
+                        <Button x:Name="btnResolution_FlyOut" Content="Identify &amp; Resolve" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="298" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8">
+                            <Button.Flyout>
+                                <Flyout>
+                                    <Viewbox>
+                                        <TextBox x:Name="tbResolution" Margin="3,0,0,0" TextWrapping="Wrap" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Identify &amp; Resolve"/>
+                                    </Viewbox>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                        <Button x:Name="btnResoultion" Content="Button" HorizontalAlignment="Left" Height="28" Margin="265,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    </Grid>
+                    <Grid x:Name="Next_Grid" Margin="13,321,0,0">
+                        <TextBox x:Name="tbNext" Height="30" Width="Auto" PlaceholderText="Next Action" Margin="-1,0,103,0" MinHeight="30" MinWidth="200" MaxWidth="200" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="4" VerticalAlignment="Top"/>
+                        <Button x:Name="btnNextCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="167,0,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                        <CheckBox x:Name="cbChronic" Content="Chronic?" HorizontalAlignment="Left" Height="25" Margin="204,0,0,0" VerticalAlignment="Top" Width="100" MinWidth="0" MinHeight="30" Foreground="#FF787878" Style="{StaticResource CheckBoxStyle1}"/>
+                    </Grid>
+                    <Button x:Name="btnProblemCode" Content="Problem Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="13,356,0,-356" FontSize="11">
+                        <Button.Flyout>
+                            <Flyout x:Name="flyProblemCode">
+                                <Viewbox x:Name="vbProblemCode" Margin="0">
+                                    <ComboBox x:Name="comboPC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Problem Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboPC_SelectionChanged"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnCauseCode" Content="Cause Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="80" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="100,356,-87,-356" FontSize="11">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <ComboBox x:Name="comboCC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Cause Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboCC_SelectionChanged" />
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnSolutionCode" Content="Solution Code" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="82" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="185,356,-172,-356" FontSize="11">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox x:Name="vbSolutionCode">
+                                    <ComboBox x:Name="comboSC" RelativePanel.AlignTopWithPanel="True" HorizontalAlignment="Left" Height="30" Margin="10,10,0,0" VerticalAlignment="Top" Width="275" PlaceholderText="Solution Code" Padding="5,0,0,0" Style="{StaticResource ComboBoxStyle1}" SelectionChanged="comboSC_SelectionChanged"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </RelativePanel>
+            </PivotItem>
+            <PivotItem x:Name="PODs" Margin="0,-10,0,0">
+                <PivotItem.Header>
+                    <Grid Height="32" Width="45" Margin="-8,-14,0,0">
+                        <SymbolIcon Symbol="Rename"  Margin="0,1,0,9" RenderTransformOrigin="0.5,0.5">
+                            <SymbolIcon.RenderTransform>
+                                <CompositeTransform ScaleX="0.75" ScaleY="0.75"/>
+                            </SymbolIcon.RenderTransform>
+                        </SymbolIcon>
+                        <TextBlock Text="PoDs" FontSize="10" Margin="13,17,10,0"/>
+                    </Grid>
+                </PivotItem.Header>
+                <RelativePanel>
+                    <Button x:Name="btnTechnicolor" Content="Technicolor" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="295" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="10,25,-7,0">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <TextBox x:Name="tbTechnicolor" Margin="3,0,0,0" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Enter Passwords" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnArris" Content="Arris" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="295" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="10,58,-7,0">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <TextBox x:Name="tbArris" Margin="3,0,0,0" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Enter Passwords" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnCisco" Content="Cisco" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="295" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="10,91,-7,-29">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <TextBox x:Name="tbCisco" Margin="3,0,0,0" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Enter Passwords" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnDory" Content="SMC Dory" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="295" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="10,124,-7,-62">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <TextBox x:Name="tbDory" Margin="3,0,0,0" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Enter Passwords" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button x:Name="btnSMC" Content="SMC" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="295" Style="{StaticResource ButtonFlyOut}" Padding="0" Foreground="#FF7A7A7A" BorderBrush="#FF7A7A7A" Background="#FFCCFFE8" Margin="10,157,-7,-95">
+                        <Button.Flyout>
+                            <Flyout>
+                                <Viewbox>
+                                    <TextBox x:Name="tbSMC" Margin="3,0,0,0" Text="" Width="277" Style="{StaticResource TextBoxStyle2}" PlaceholderText="Enter Passwords" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+                                </Viewbox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </RelativePanel>
+            </PivotItem>
+            <PivotItem x:Name="Dictionary" Margin="0,-15,0,0">
+                <PivotItem.Header>
+                    <Grid Height="32" Width="45" Margin="-8,-14,0,0">
+                        <SymbolIcon Symbol="List"  Margin="0,1,0,9" RenderTransformOrigin="0.5,0.5">
+                            <SymbolIcon.RenderTransform>
+                                <CompositeTransform ScaleX="0.75" ScaleY="0.75"/>
+                            </SymbolIcon.RenderTransform>
+                        </SymbolIcon>
+                        <TextBlock Text="Dictionary" FontSize="10" Margin="0,17,0,0"/>
+                    </Grid>
+                </PivotItem.Header>
+                <Grid>
+                    <TextBox x:Name="tbAddWord" Height="30" Width="Auto" PlaceholderText="Word :: Replace Word" Margin="10,10,10,0" MinHeight="30" MinWidth="295" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                    <Button x:Name="btnSetWord" Content="Button" HorizontalAlignment="Left" Height="30" Margin="272,10,0,0" VerticalAlignment="Top" Width="33" Style="{StaticResource ButtonStyle2}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B"/>
+                    <ListBox x:Name="AutoReplaceList" HorizontalAlignment="Left" Height="342" Margin="10,45,0,0" VerticalAlignment="Top" Width="295" Style="{StaticResource ListBoxStyle1}"/>
+                </Grid>
+            </PivotItem>
+            <PivotItem x:Name="Alarms" Margin="0,-15,0,0">
+                <PivotItem.Header>
+                    <Grid Height="32" Width="45" Margin="-8,-14,0,0">
+                        <SymbolIcon Symbol="Clock"  Margin="0,1,0,9" RenderTransformOrigin="0.5,0.5">
+                            <SymbolIcon.RenderTransform>
+                                <CompositeTransform ScaleX="0.75" ScaleY="0.75"/>
+                            </SymbolIcon.RenderTransform>
+                        </SymbolIcon>
+                        <TextBlock Text="Alarms" FontSize="10" Margin="0,17,0,0"/>
+                    </Grid>
+                </PivotItem.Header>
+                <Grid/>
+            </PivotItem>
+        </Pivot>
+
     </Grid>
+
 </Page>

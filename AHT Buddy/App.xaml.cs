@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 
 
 
+
 namespace AHT_Buddy
 {
     /// <summary>
@@ -26,6 +27,7 @@ namespace AHT_Buddy
     /// </summary>
     sealed partial class App : Application
     {
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -34,8 +36,8 @@ namespace AHT_Buddy
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            
-        }
+           
+    }
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -81,8 +83,8 @@ namespace AHT_Buddy
                 }
                 // Ensure the current window is active
                 
-                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(315, 435));
-                ApplicationView.PreferredLaunchViewSize = new Size(315, 435);
+                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(315, 480));
+                ApplicationView.PreferredLaunchViewSize = new Size(315, 480);
                 ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
                 Window.Current.Activate();
             }

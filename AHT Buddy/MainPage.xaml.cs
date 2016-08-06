@@ -22,7 +22,8 @@ namespace AHT_Buddy
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    
+    public partial class MainPage : Page
     {
 
         #region Remedy Codes : Class
@@ -121,11 +122,68 @@ namespace AHT_Buddy
             };
         }
         #endregion
+        #region Alarm : Class
+        
+        public class Alarm
+        {
+            public DateTime Time { get; set; }
+            public bool Armed { get; set; }
 
+            public bool Triggered(DateTime Time, DateTime CurrentTime)
+            {
+                if (Time == CurrentTime)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        #endregion
+        #region Auto Replace Dictionary : Class
+        public class Dict : ObservableCollection<Dict>
+        {
+            public Dictionary<string, string> Word = new Dictionary<string, string>();
+     
+        }
+        #endregion
+        #region Call Data : Class
+        public class cxData : ObservableCollection<cxData>
+        {
+            
+            private Dictionary<int, string[]> cx = new Dictionary<int, string[]>();
+            
+            public string Email { get; set; }
+            public string Ticket { get; set; }
+            public string Name { get; set; }
+            public string Account { get; set; }
+            public string Contact { get; set; }
+            public string Device { get; set; }
+            public string Issue { get; set; }
+            public string Resolution { get; set; }
+            public string Next { get; set; }
+            public string Attempt { get; set; }
+            public string Chronic { get; set; }
+
+            public int CallNum { get; set; }
+
+            public void SaveCall ()
+            {                
+                string[] CallData = new string[11] { Email, Ticket, Name, Account, Contact, Device, Issue, Resolution, Next, Attempt, Chronic };
+                cx.Add(CallNum, CallData);                
+            }  
+                               
+        }
+        #endregion
+
+        public cxData Customer = new cxData();
+        public int CallCount;
         public MainPage()
         {
             this.InitializeComponent();
-            abbCustomer.IsChecked = true;
+            
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
@@ -134,22 +192,14 @@ namespace AHT_Buddy
             comboSC.DisplayMemberPath = "Value";
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
+            
         }
-
-        private void AppBar_Opening(object sender, object e)
-        {
-            NavigateBar.Visibility = Visibility.Visible;
-        }
-        private void AppBar_Closing(object sender, object e)
-        {
-            NavigateBar.Visibility = Visibility.Collapsed;
-        }
+        #region Remedy Code Operations
         #region Problem Code Combo Box Selection Changed
         private void comboPC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(comboPC.SelectedIndex == -1) { return; }
-            
-            
+
             if (comboPC.SelectedValue.ToString() == "15003" ||
                comboPC.SelectedValue.ToString() == "15002" ||
                comboPC.SelectedValue.ToString() == "15001" ||
@@ -214,7 +264,7 @@ namespace AHT_Buddy
             }
             btnProblemCode.Content = comboPC.SelectedValue;
         }
-        #endregion
+        #endregion      
         #region Cause Code Combox Selection Changed
         private void comboCC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -293,6 +343,44 @@ namespace AHT_Buddy
             if(comboSC.SelectedIndex == -1) { return; }
             btnSolutionCode.Content = comboSC.SelectedValue;
 
+        }
+        #endregion
+        #endregion
+        #region Call Operations
+        private void SaveCallData()
+        {
+            Customer.Email = tbEmail.Text;
+            Customer.Ticket = tbTicket.Text;
+            Customer.Name = tbCustomer.Text;
+            Customer.Account = tbAccount.Text;
+            Customer.Contact = tbContact.Text;
+            Customer.Device = tbAffected.Text;
+            Customer.Issue = tbIssue.Text;
+            Customer.Resolution = tbResolution.Text;
+            Customer.Next = tbNext.Text;
+            Customer.Attempt = tbAttempt.Text;
+            if(cbChronic.IsChecked == true){ Customer.Chronic = "y"; } else { Customer.Chronic = "n"; }
+            Customer.CallNum = CallCount;
+            Customer.SaveCall();
+        }
+        private void abbNewCall_Click(object sender, RoutedEventArgs e)
+        {
+            if(string.IsNullOrEmpty(tbEmail.Text) &&
+                string.IsNullOrEmpty(tbTicket.Text) &&
+                string.IsNullOrEmpty(tbCustomer.Text) &&
+                string.IsNullOrEmpty(tbAccount.Text) &&
+                string.IsNullOrEmpty(tbContact.Text) &&
+                string.IsNullOrEmpty(tbAffected.Text) &&
+                string.IsNullOrEmpty(tbIssue.Text) &&
+                string.IsNullOrEmpty(tbResolution.Text))
+            {
+                return;
+            }
+            else
+            {
+                CallCount++;
+                SaveCallData();
+            }
         }
         #endregion
     }
