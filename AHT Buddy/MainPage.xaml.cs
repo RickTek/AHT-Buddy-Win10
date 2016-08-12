@@ -14,10 +14,26 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Notifications;
 using System.Collections.ObjectModel;
 using System.Collections;
+using System.Windows;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using SQLite.Net;
 using SQLite.Net.Attributes;
+using System.Data;
+using Windows.UI.Popups;
+using System.ComponentModel;
+
+
+
+
+
+
+
+
+
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -26,10 +42,9 @@ namespace AHT_Buddy
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    
+
     public partial class MainPage : Page
     {
-
         #region Remedy Codes : Class
         abstract class code : ObservableCollection<code>
         {
@@ -98,7 +113,7 @@ namespace AHT_Buddy
             };
             public static Dictionary<int, string> sc2804 = new Dictionary<int, string>()
             {
-                {2804, "Cx Education Hardware/Software" }                
+                {2804, "Cx Education Hardware/Software" }
             };
             public static Dictionary<int, string> sc6045 = new Dictionary<int, string>()
             {
@@ -116,7 +131,7 @@ namespace AHT_Buddy
             {
                 {9797, "Premise Truck Roll" }
             };
-            
+
             public static Dictionary<int, string> sc347 = new Dictionary<int, string>()
             {
                 {6085, "Power Cycle Modem" },
@@ -127,37 +142,74 @@ namespace AHT_Buddy
         }
         #endregion
         #region Alarm : Class
-        
-        public class Alarm
-        {
-            public DateTime Time { get; set; }
-            public bool Armed { get; set; }
 
-            public bool Triggered(DateTime Time, DateTime CurrentTime)
+        public class Alarm : ObservableCollection<SetAlarm>
+        {       
+            public string Name { get; set; }
+            public DateTime Time { get; set; }
+            public DateTime CurrentTime { get; set; }
+            public bool Armed { get; set; }
+            
+    
+            public bool Triggered()
+              {
+               if (Time == CurrentTime)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+              }
+
+        }
+        public class SetAlarm
+        {
+            private string Name;
+            private DateTime Time;
+            public SetAlarm(string Name, DateTime Time)
             {
-                if (Time == CurrentTime)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                this.Name = Name;
+                this.Time = Time;
             }
+
         }
         #endregion
         #region Auto Replace Dictionary : Class
-        public class Dict : ObservableCollection<Dict>
+        public class AutoReplaceDictionary : ObservableCollection<WordPair>
         {
-            public Dictionary<string, string> Word = new Dictionary<string, string>();
-     
+            public AutoReplaceDictionary() : base()
+            {
+
+            }
+        }
+        public class WordPair
+        {
+            private string word;
+            private string replaceword;
+            public WordPair(string word, string replaceword)
+            {
+                this.word = word;
+                this.replaceword = replaceword;
+            }
+
+            public string Word
+            {
+                get { return word; }
+                set { word = value; }
+            }
+            public string ReplaceWord
+            {
+                get { return replaceword; }
+                set { replaceword = value; }
+            }
         }
         #endregion
         #region Call Data : Class
         public class Customer
         {
-
-           [PrimaryKey, AutoIncrement]
+            [PrimaryKey, AutoIncrement]
             public int Id { get; set; }
             public string Email { get; set; }
             public string Ticket { get; set; }
@@ -170,26 +222,185 @@ namespace AHT_Buddy
             public string Next { get; set; }
             public string Attempt { get; set; }
             public bool Chronic { get; set; }
+            public int ProblemCode { get; set; }
+            public int CauseCode { get; set; }
+            public int SolutionCode { get; set; }
+
             public DateTime TimeStamp { get; set; }
         }
-
-
-
-
         #endregion
-
-        string path;
-        SQLite.Net.SQLiteConnection conn;
+        #region Wireless Gateway PoD : Class
 
 
-        //public cxData Customer = new cxData();
-        //public int CallCount;
+        public class Technicolor
+        {
+
+            public string PoD { get; set; }
+            public bool PM { get; set; }
+            public string GetPoD()
+            {
+                int pos = 0;
+                if (!string.IsNullOrEmpty(PoD))
+                {
+                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
+
+                    if (PM == true)
+                    {
+                        DateTime NextDay = DateTime.Now;
+                        DayNum = NextDay.AddDays(1).ToString("dd-MMM-yy").ToUpper();
+                    }
+
+                    string[] sPoD = PoD.Split('\t', '\n');
+                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
+
+                    return PoD = sPoD.ElementAt(pos += 1);
+                }
+                else
+                {
+                    return PoD = "no password set";
+                }
+            }
+        }
+        public class Arris
+        {
+            
+            public string PoD { get; set; }
+            public string GetPoD()
+            {
+                int pos = 0;
+                if (!string.IsNullOrEmpty(PoD))
+                {
+                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
+
+                    string[] sPoD = PoD.Split('\t', '\n');
+                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
+
+                    return PoD = sPoD.ElementAt(pos += 1);
+                }
+                else
+                {
+                    return PoD = "no password set";
+                }
+            }
+        }
+        public class Cisco
+        {
+            public string PoD { get; set; }
+            public string GetPoD()
+            {
+                int pos = 0;
+                if (!string.IsNullOrEmpty(PoD))
+                {
+                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
+
+                    string[] sPoD = PoD.Split('\t', '\n');
+                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
+
+                    return PoD = sPoD.ElementAt(pos += 1);
+                }
+                else
+                {
+                    return PoD = "no password set";
+                }
+            }
+        }
+        public class Dory
+        {
+            
+            public string PoD { get; set; }
+            public string GetPoD()
+            {
+                int pos = 0;
+                if (!string.IsNullOrEmpty(PoD))
+                {
+                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
+
+                    string[] sPoD = PoD.Split('\t', '\n');
+                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
+
+                    return PoD = sPoD.ElementAt(pos += 1);
+                }
+                else
+                {
+                    return PoD = "no password set";
+                }
+            }
+        }
+        public class SMC
+        {
+            
+            public string PoD { get; set; }
+            public string GetPoD()
+            {
+               
+                if (!string.IsNullOrEmpty(PoD))
+                {
+                    int pos = 0;
+                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
+                    string[] sPoD = PoD.Split('\t', '\n');
+                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
+
+                    return PoD = sPoD.ElementAt(pos += 1);
+                }
+                else
+                {
+                    return PoD = "no password set";
+                }
+            }
+        }
+        #endregion
+        public static IEnumerable<T> FindVisualChildern<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if(depObj != null)
+            {
+                for(int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if(child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach(T childOfDChild in FindVisualChildern<T>(child))
+                    {
+                        yield return childOfDChild;
+                    }
+                }
+            }
+            
+        }
+        private async Task<bool> CheckFileExists(string filename) 
+        {
+            try
+            {
+                var store = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync(filename);
+                return true;
+            }
+            catch
+            {
+            }
+            return false;
+        }
+        
+        public DispatcherTimer clock = new DispatcherTimer();
+        public static string cData = "CallData.sqlite";
+        public static string path = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, cData);
+        SQLiteConnection db = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), path);
+       
+        AutoReplaceDictionary arList = new AutoReplaceDictionary();
+
+        Technicolor technicolor = new Technicolor();
+        Arris arris = new Arris();
+        Cisco cisco = new Cisco();
+        Dory dory = new Dory();
+        SMC smc = new SMC();
+        Alarm alarm = new Alarm();
+
         public MainPage()
         {
             this.InitializeComponent();
-            path = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "CallData.sqlite");
-            SQLite.Net.SQLiteConnection conn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), path);
-            conn.CreateTable<Customer>();
+
+            db.CreateTable<Customer>();
 
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
@@ -199,11 +410,18 @@ namespace AHT_Buddy
             comboSC.DisplayMemberPath = "Value";
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
+            
+            Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
 
+            clock.Tick += Clock_Ticker;
+            clock.Interval = new TimeSpan(0, 0, 1);
+            clock.Start();
             
-           
-            
-            
+        }
+        
+        private void Clock_Ticker(object sender, object e)
+        {
+            tbTime.Text = DateTime.Now.ToString("T");
         }
         #region Remedy Code Operations
         #region Problem Code Combo Box Selection Changed
@@ -358,13 +576,31 @@ namespace AHT_Buddy
         #endregion
         #endregion
         #region Call Operations
+        private void NewCall_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(tbEmail.Text) &&
+               string.IsNullOrEmpty(tbTicket.Text) &&
+               string.IsNullOrEmpty(tbName.Text) &&
+               string.IsNullOrEmpty(tbAccount.Text) &&
+               string.IsNullOrEmpty(tbContact.Text) &&
+               string.IsNullOrEmpty(tbDevice.Text) &&
+               string.IsNullOrEmpty(tbIssue.Text) &&
+               string.IsNullOrEmpty(tbResolution.Text))
+            {
+                return;
+            }
+            else
+            {
+                SaveCallData();
+            }
+        }
         private void SaveCallData()
         {
-            conn.Insert(new Customer()
+            db.Insert(new Customer()
             {
                 Email = tbEmail.Text,
                 Ticket = tbTicket.Text,
-                Name = tbCustomer.Text,
+                Name = tbName.Text,
                 Account = tbAccount.Text,
                 Contact = tbContact.Text,
                 Device = tbDevice.Text,
@@ -377,25 +613,227 @@ namespace AHT_Buddy
                 
             });
             
+            foreach(TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
+            {
+                tb.Text = string.Empty;                   
+            }
         }
-        private void abbNewCall_Click(object sender, RoutedEventArgs e)
+        private void btnEmailCopy_Click(object sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrEmpty(tbEmail.Text) &&
-                string.IsNullOrEmpty(tbTicket.Text) &&
-                string.IsNullOrEmpty(tbCustomer.Text) &&
-                string.IsNullOrEmpty(tbAccount.Text) &&
-                string.IsNullOrEmpty(tbContact.Text) &&
-                string.IsNullOrEmpty(tbDevice.Text) &&
-                string.IsNullOrEmpty(tbIssue.Text) &&
-                string.IsNullOrEmpty(tbResolution.Text))
+            CopyToClipboard(tbEmail.Text);
+        }
+        #endregion
+        #region PoD Operations
+        private void CopyPod_Click(object sender, RoutedEventArgs e)
+        {
+            switch (comboWG.SelectedIndex)
+            {
+                case -1:
+                    {
+                        return;
+                    }
+                case 0:
+                    {
+                        CopyToClipboard(technicolor.GetPoD());
+                        return;
+                    }
+                case 1:
+                    {
+                        CopyToClipboard(arris.GetPoD());
+                        return;
+                    }
+                case 2:
+                    {
+                        CopyToClipboard(cisco.GetPoD());
+                        return;
+                    }
+                case 3:
+                    {
+                        CopyToClipboard(dory.GetPoD());
+                        return;
+                    }
+                case 4:
+                    {
+                        CopyToClipboard(smc.GetPoD());
+                        return;
+                    }
+            }
+        }
+        private void PODs_PivotItem_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(technicolor.PoD))
+            {
+                technicolor.PoD = tbTechnicolor.Text;
+                tblockTechnicolor.Text = technicolor.GetPoD();
+            }
+            if (!string.IsNullOrEmpty(tbArris.Text))
+            {
+                arris.PoD = tbArris.Text;
+                tblockArris.Text = arris.GetPoD();
+            }
+            if (!string.IsNullOrEmpty(tbCisco.Text))
+            {
+                cisco.PoD = tbCisco.Text;
+                tblockCisco.Text = cisco.GetPoD();
+            }
+            if (!string.IsNullOrEmpty(tbDory.Text))
+            {
+                dory.PoD = tbDory.Text;
+                tblockDory.Text = dory.GetPoD();
+            }
+            if (!string.IsNullOrEmpty(tbSMC.Text))
+            {
+                smc.PoD = tbSMC.Text;
+                tblockSMC.Text = smc.GetPoD();
+            }
+        }
+
+        private void cbTechnicolorPM_Checked(object sender, RoutedEventArgs e)
+        {
+            technicolor.PM = true;            
+        }
+        private void cbTechnicolorPM_Unchecked(object sender, RoutedEventArgs e)
+        {
+            technicolor.PM = false;
+        }
+        #endregion
+               
+        private async void _MessageBox(string msg)
+        {
+            MessageDialog showDialog = new MessageDialog(msg);
+            showDialog.Commands.Add(new UICommand("Ok") { Id = 0 });
+            showDialog.DefaultCommandIndex = 0;
+            var result = await showDialog.ShowAsync();
+
+            if ((int)result.Id == 0)
             {
                 return;
             }
             else
             {
-                SaveCallData();
+                return;
             }
         }
-        #endregion
+        private static void CopyToClipboard(string CopyString)
+        {
+
+            // Create an instance of the DataPackage and set the RequestedOperation to DataPackageOperation.Copy 
+
+            DataPackage dataPackageobj = new DataPackage
+            {
+
+                RequestedOperation = DataPackageOperation.Copy
+
+            };
+
+            // Set the Text that you want to copy 
+
+            dataPackageobj.SetText(CopyString);
+
+            // Set the data package instance to the Clipboard 
+
+            Clipboard.SetContent(dataPackageobj);
+
+        }
+        private void btnSetWord_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(tbAddWord.Text))
+            {
+                return;
+            }
+            else
+            {
+                bool containsDelimiter = tbAddWord.Text.Contains("~~");
+
+                string[] SplitString = tbAddWord.Text.Split(new string[] { "~~" }, StringSplitOptions.None);
+
+                if(!arList.Any(w => w.Word == SplitString[0]) && containsDelimiter == true)
+                {
+                    arList.Add(new WordPair(SplitString[0], SplitString[1]));
+                }
+                else
+                {
+                    if(containsDelimiter == false)
+                    {
+                        _MessageBox("Dictionary entries must use the ~~ delimiter to separate your Words!");
+                    }
+                    else
+                    {
+                        _MessageBox("This Key:Value pair " + SplitString[0] + "~~" + SplitString[1] + " " + "\nIs already in the Dictionary!");
+                    }
+                    
+                }
+            }
+        }
+
+        private void Alarms_PivotItems_GotFocus(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void Dictionary_PivotItem_GotFocus(object sender, RoutedEventArgs e)
+        {
+            
+                
+        
+        }
+
+        private void Generate_Click(object sender, RoutedEventArgs e)
+        {
+            string _Date = DateTime.Now.ToString("MM/dd/yyyy");
+            string chronic;
+
+            if(cbChronic.IsChecked == true){chronic = "Yes";}else { chronic = "No"; }
+            if (string.IsNullOrEmpty(tbAttempt.Text))
+            {
+                tbAttempt.Text = "1";
+            }
+            string formatNotes = 
+                "Date: {0}\n" +
+                "Ticket: {1}\n" +
+                "Cutomer Name: {2}\n" +
+                "Account Number: {3}\n" +
+                "Chronic Account: {4}\n" +
+                "Attempt Number: {5}\n" +
+                "Contact Number: (6)\n" +
+                "Affected Device: {7}\n" +
+                "Reported Issue: {8}\n" +
+                "Steps Taken to Identify and Resolve: {9}\n" +
+                "Next Action: {10}\n";
+
+            string RemedyNotes = string.Format(formatNotes, _Date, tbTicket.Text, tbName.Text, tbAccount.Text, chronic,
+                                               tbAttempt.Text, tbContact.Text, tbDevice.Text, tbIssue.Text, tbResolution.Text, tbNext.Text);
+            CopyToClipboard(RemedyNotes);
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+           
+            
+        }
+        private void Toast()
+        {
+            var xmlToastTemplate = "<toast launch=\"app-defined-string\">" +
+                        "<visual>" +
+                          "<binding template =\"ToastGeneric\">" +
+                            "<text>Time for Break!</text>" +
+                            "<text>" +
+                              "This is a sample toast notification from kunal-chowdhury.com" +
+                            "</text>" +
+                          "</binding>" +
+                        "</visual>" +
+                        "<audio src=\"ms-winsoundevent:Notification.Looping.Alarm9\" Loop=\"false\"/>" +
+                      "</toast>";
+
+            // load the template as XML document
+            var xmlDocument = new Windows.Data.Xml.Dom.XmlDocument();
+            xmlDocument.LoadXml(xmlToastTemplate);
+
+            // create the toast notification and show to user
+            var toastNotification = new ToastNotification(xmlDocument);
+            var notification = ToastNotificationManager.CreateToastNotifier();
+            notification.Show(toastNotification);
+
+        }
     }
 }
