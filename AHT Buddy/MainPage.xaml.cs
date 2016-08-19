@@ -26,15 +26,6 @@ using System.Data;
 using Windows.UI.Popups;
 using System.ComponentModel;
 
-
-
-
-
-
-
-
-
-
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace AHT_Buddy
@@ -143,38 +134,34 @@ namespace AHT_Buddy
         #endregion
         #region Alarm : Class
 
-        public class Alarm : ObservableCollection<SetAlarm>
-        {       
-            public string Name { get; set; }
-            public DateTime Time { get; set; }
-            public DateTime CurrentTime { get; set; }
-            public bool Armed { get; set; }
-            
-    
-            public bool Triggered()
-              {
-               if (Time == CurrentTime)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-              }
-
-        }
-        public class SetAlarm
+        public class Alarm
         {
-            private string Name;
-            private DateTime Time;
-            public SetAlarm(string Name, DateTime Time)
+            private Dictionary<string, TimeSpan> settime = new Dictionary<string, TimeSpan>();
+            private Dictionary<string, bool> armed = new Dictionary<string, bool>();
+
+            public void SetAlarm(string Name, TimeSpan Time, bool Armed)
             {
-                this.Name = Name;
-                this.Time = Time;
+                settime.Add(Name, Time);
+                armed.Add(Name, Armed);
             }
 
+            public void AlarmOff(string Name)
+            {                
+                armed[Name] = false;
+            }
+            public void AlarmOn(string Name)
+            {
+                armed[Name] = true;
+            }
+
+            public void ChangeAlarm(string Name, TimeSpan Time)
+            {
+                settime[Name] = Time;
+            }
+
+            
         }
+    
         #endregion
         #region Auto Replace Dictionary : Class
         public class AutoReplaceDictionary : ObservableCollection<WordPair>
@@ -207,27 +194,71 @@ namespace AHT_Buddy
         }
         #endregion
         #region Call Data : Class
+  
+        public class CallData : ObservableCollection<Customer>
+        {
+            public CallData() : base() { }
+            
+        }
         public class Customer
         {
-            [PrimaryKey, AutoIncrement]
-            public int Id { get; set; }
-            public string Email { get; set; }
-            public string Ticket { get; set; }
-            public string Name { get; set; }
-            public string Account { get; set; }
-            public string Contact { get; set; }
-            public string Device { get; set; }
-            public string Issue { get; set; }
-            public string Resolution { get; set; }
-            public string Next { get; set; }
-            public string Attempt { get; set; }
-            public bool Chronic { get; set; }
-            public int ProblemCode { get; set; }
-            public int CauseCode { get; set; }
-            public int SolutionCode { get; set; }
+            private string email;
+            private string ticket;
+            private string name;
+            private string account;
+            private string contact;
+            private string device;
+            private string issue;
+            private string resolution;
+            private string next;
+            private string attempt;
+            private bool chronic;
+            private string timestamp;
+            
+            public string Email { get { return email; } set { email = value; } }
+            public string Ticket { get { return ticket; } set { ticket = value; } }
+            public string Name { get { return name; } set { name = value; } }
+            public string Account { get { return account; } set { account = value; } }
+            public string Contact { get { return contact; } set { contact = value; } }
+            public string Device { get { return device; } set { device = value; } }
+            public string Issue { get { return issue; } set { issue = value; } }
+            public string Resolution { get { return resolution; } set { resolution = value; } }
+            public string Next { get { return next; } set { next = value; } }
+            public string Attempt { get { return attempt; } set { attempt = value; } }
+            public bool Chronic { get { return chronic; } set { chronic = value; } }
+            public string TimeStamp { get { return timestamp; } set { timestamp = value; } }
 
-            public DateTime TimeStamp { get; set; }
+            public Customer(
+                string Email, 
+                string Ticket,
+                string Name,
+                string Account,
+                string Contact,
+                string Device,
+                string Issue,
+                string Resolution,
+                string Next,
+                string Attempt,
+                bool Chronic,
+                string TimeStamp)
+            {
+                this.email = Email;
+                this.ticket = Ticket;
+                this.name = Name;
+                this.account = Account;
+                this.contact = Contact;
+                this.device = Device;
+                this.issue = Issue;
+                this.resolution = Resolution;
+                this.next = Next;
+                this.attempt = Attempt;
+                this.Chronic = Chronic;
+                this.timestamp = TimeStamp;
+                
+            }
+            
         }
+
         #endregion
         #region Wireless Gateway PoD : Class
 
@@ -251,6 +282,7 @@ namespace AHT_Buddy
                     }
 
                     string[] sPoD = PoD.Split('\t', '\n');
+                    
                     pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
 
                     return PoD = sPoD.ElementAt(pos += 1);
@@ -338,6 +370,7 @@ namespace AHT_Buddy
                     int pos = 0;
                     string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
                     string[] sPoD = PoD.Split('\t', '\n');
+
                     pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
 
                     return PoD = sPoD.ElementAt(pos += 1);
@@ -383,11 +416,12 @@ namespace AHT_Buddy
         }
         
         public DispatcherTimer clock = new DispatcherTimer();
-        public static string cData = "CallData.sqlite";
+        public static string cData = "WordList.sqlite";
         public static string path = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, cData);
         SQLiteConnection db = new SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), path);
        
         AutoReplaceDictionary arList = new AutoReplaceDictionary();
+        CallData calldata = new CallData();
 
         Technicolor technicolor = new Technicolor();
         Arris arris = new Arris();
@@ -396,11 +430,14 @@ namespace AHT_Buddy
         SMC smc = new SMC();
         Alarm alarm = new Alarm();
 
+        
+
         public MainPage()
         {
             this.InitializeComponent();
 
-            db.CreateTable<Customer>();
+            
+            db.CreateTable<WordPair>();
 
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
@@ -412,11 +449,11 @@ namespace AHT_Buddy
             comboPC.SelectedValue = -1;
             
             Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
+            
 
             clock.Tick += Clock_Ticker;
             clock.Interval = new TimeSpan(0, 0, 1);
-            clock.Start();
-            
+            clock.Start();            
         }
         
         private void Clock_Ticker(object sender, object e)
@@ -596,24 +633,27 @@ namespace AHT_Buddy
         }
         private void SaveCallData()
         {
-            db.Insert(new Customer()
-            {
-                Email = tbEmail.Text,
-                Ticket = tbTicket.Text,
-                Name = tbName.Text,
-                Account = tbAccount.Text,
-                Contact = tbContact.Text,
-                Device = tbDevice.Text,
-                Issue = tbIssue.Text,
-                Resolution = tbResolution.Text,
-                Next = tbNext.Text,
-                Attempt = tbAttempt.Text,
-                Chronic = cbChronic.IsChecked.Value,
-                TimeStamp = DateTime.Now
-                
-            });
+
+            calldata.Add(new Customer(
+                tbEmail.Text,
+                tbTicket.Text,
+                tbName.Text,
+                tbAccount.Text,
+                tbContact.Text,
+                tbDevice.Text,
+                tbIssue.Text,
+                tbResolution.Text,
+                tbNext.Text,
+                tbAttempt.Text,
+                cbChronic.IsChecked.Value,
+                DateTime.Now.ToString()
+                )
+                );
             
-            foreach(TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
+                
+            
+
+            foreach (TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
             {
                 tb.Text = string.Empty;                   
             }
@@ -624,7 +664,8 @@ namespace AHT_Buddy
         }
         #endregion
         #region PoD Operations
-        private void CopyPod_Click(object sender, RoutedEventArgs e)
+
+        private void btnPoDcopy_Click(object sender, RoutedEventArgs e)
         {
             switch (comboWG.SelectedIndex)
             {
@@ -766,29 +807,44 @@ namespace AHT_Buddy
             }
         }
 
-        private void Alarms_PivotItems_GotFocus(object sender, RoutedEventArgs e)
+        private void Toast(string msg)
         {
-            
-        }
+            var xmlToastTemplate = "<toast launch=\"app-defined-string\">" +
+                        "<visual>" +
+                          "<binding template =\"ToastGeneric\">" +
+                            "<text>Time for Break!</text>" +
+                           
+                          "</binding>" +
+                        "</visual>" +
+                        "<audio src=\"ms-winsoundevent:Notification.Looping.Alarm9\" Loop=\"false\"/>" +
+                      "</toast>";
 
-        private void Dictionary_PivotItem_GotFocus(object sender, RoutedEventArgs e)
-        {
-            
-                
-        
-        }
+            // load the template as XML document
+            var xmlDocument = new Windows.Data.Xml.Dom.XmlDocument();
+            xmlDocument.LoadXml(xmlToastTemplate);
 
+            // create the toast notification and show to user
+            var toastNotification = new ToastNotification(xmlDocument);
+            var notification = ToastNotificationManager.CreateToastNotifier();
+            notification.Show(toastNotification);
+
+        }
+  
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
             string _Date = DateTime.Now.ToString("MM/dd/yyyy");
             string chronic;
 
-            if(cbChronic.IsChecked == true){chronic = "Yes";}else { chronic = "No"; }
+            if (cbChronic.IsChecked == true) { chronic = "Yes"; } else { chronic = "No"; }
             if (string.IsNullOrEmpty(tbAttempt.Text))
             {
                 tbAttempt.Text = "1";
             }
-            string formatNotes = 
+            if (string.IsNullOrEmpty(tbNext.Text))
+            {
+                tbNext.Text = "N/A";
+            }
+            string formatNotes =
                 "Date: {0}\n" +
                 "Ticket: {1}\n" +
                 "Cutomer Name: {2}\n" +
@@ -806,33 +862,77 @@ namespace AHT_Buddy
             CopyToClipboard(RemedyNotes);
         }
 
-        private void Exit_Click(object sender, RoutedEventArgs e)
+        private void lbHours_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           
+          
+        }
+
+        private void lbHours_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        {
+
+        }
+
+        private void btnPreviousCall_Click(object sender, RoutedEventArgs e)
+        {
+            
+
+        }
+
+        private void btnNewCall_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void lbPreviousCallData_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
             
         }
-        private void Toast()
+
+        private void GetCallData_Click(object sender, RoutedEventArgs e)
         {
-            var xmlToastTemplate = "<toast launch=\"app-defined-string\">" +
-                        "<visual>" +
-                          "<binding template =\"ToastGeneric\">" +
-                            "<text>Time for Break!</text>" +
-                            "<text>" +
-                              "This is a sample toast notification from kunal-chowdhury.com" +
-                            "</text>" +
-                          "</binding>" +
-                        "</visual>" +
-                        "<audio src=\"ms-winsoundevent:Notification.Looping.Alarm9\" Loop=\"false\"/>" +
-                      "</toast>";
+            int si = lbPreviousCallData.SelectedIndex;
+            tbEmail.Text = calldata[si].Email.ToString();
+            tbTicket.Text = calldata[si].Ticket.ToString();
+            tbName.Text = calldata[si].Name.ToString();
+            tbAccount.Text = calldata[si].Account.ToString();
+            tbContact.Text = calldata[si].Contact.ToString();
+            tbDevice.Text = calldata[si].Device.ToString();
+            tbIssue.Text = calldata[si].Issue.ToString();
+            tbResolution.Text = calldata[si].Resolution.ToString();
+            tbNext.Text = calldata[si].Next.ToString();
+            tbAttempt.Text = calldata[si].Attempt.ToString();
+            cbChronic.IsChecked = calldata[si].Chronic;
 
-            // load the template as XML document
-            var xmlDocument = new Windows.Data.Xml.Dom.XmlDocument();
-            xmlDocument.LoadXml(xmlToastTemplate);
+        }
+        private void AutoReplace(TextBox txt)
+        {
+            string GotLastWord;
+            string ReplaceWord;
+            
+            int lastword = txt.Text.LastIndexOf(" ");
 
-            // create the toast notification and show to user
-            var toastNotification = new ToastNotification(xmlDocument);
-            var notification = ToastNotificationManager.CreateToastNotifier();
-            notification.Show(toastNotification);
+            lastword += 1;
+            GotLastWord = txt.Text.Substring(lastword);
+
+            if (arList.Any(w => w.Word == GotLastWord))
+            {
+                ReplaceWord = GotLastWord.Replace(GotLastWord, arList.Where(w => w.Word == GotLastWord).Select(w => w.ReplaceWord).ToString());
+                txt.Text = txt.Text.Replace(GotLastWord, ReplaceWord);
+                txt.SelectionStart = txt.Text.Length;
+                
+            }
+
+
+
+        }
+        private void tbIssue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            
+            
+        }
+
+        private void tbEmail_TextChanged(object sender, TextChangedEventArgs e)
+        {
 
         }
     }

@@ -36,6 +36,7 @@ namespace AHT_Buddy
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+             
            
     }
 
@@ -83,9 +84,12 @@ namespace AHT_Buddy
                 }
                 // Ensure the current window is active
                 
-                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(315, 435));
-                ApplicationView.PreferredLaunchViewSize = new Size(315, 435);
+                ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(315, 415));
+                
+                
+                ApplicationView.PreferredLaunchViewSize = new Size(315, 415);
                 ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
                 Window.Current.Activate();
             }
         }
