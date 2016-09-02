@@ -8,11 +8,8 @@ using System.Collections;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Data;
-
-
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -23,10 +20,13 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Notifications;
 using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
-
 using Windows.UI.Popups;
-
 using Windows.System;
+using System.Text.RegularExpressions;
+using Microsoft.Toolkit.Uwp.Notifications;
+using System.Xml.Linq;
+using System.ComponentModel;
+
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -54,146 +54,22 @@ namespace AHT_Buddy
             return element.TransformToVisual(container).TransformBounds(new Rect(0.0, 0.0, element.ActualWidth, element.ActualHeight));
         }
     }
-
-
-
     public partial class MainPage : Page
     {
-    
-        #region Remedy Codes : Class
-        abstract class code : ObservableCollection<code>
-        {
-            public static Dictionary<int, string> ProblemCode = new Dictionary<int, string>()
-            {
-                {15003, "WG - No Internet - All" },
-                {15002, "WG - No Internet - Multiple" },
-                {15001, "WG - No Internet - Single" },
-                {1126, "WG - Login/PW Issues" },
-                {15006, "WiFi - No Connection - All" },
-                {15005, "WiFi - No Connection - Multiple" },
-                {15004, "WiFi - No Connection - Single" },
-                {14179, "WG - Bridge Mode Toggle" },
-                {15567, "WiFi/HW - Connected to WG, No Internet" },
-                {15730, "Update WiFi Password" },
-                {15731, "Update WiFi SSID" },
-                {1129, "Change WiFi Settings/Security" },
-                {14194,"WG - Slow Connectivity" },
-                {14966, "WG - Intermittent Connectivity" },
-                {16176, "Stuck in Captive Portal" }
-            };
-            public static Dictionary<int, string> cc1500x = new Dictionary<int, string>()
-            {
-                {165, "Customer Education" },
-                {1559, "Forgot WiFi Password" },
-                {347, "Hardware/Software Failure or Configuration" },
-                {1083, "Customer Ticket Follow up" },
-                {825, "Truck Roll" }
-            };
-            public static Dictionary<int, string> cc1126 = new Dictionary<int, string>()
-            {
-                {1559, "Forgot WiFi Password" },
-                {1083, "Customer Ticket Follow Up" },
-                {825, "Truck Roll" }
-            };
-            public static Dictionary<int, string> cc14179 = new Dictionary<int, string>()
-            {
-                {123, "Configuration Error" },
-                {1083, "Customer Ticket Follow Up" },
-                {825, "Truck Roll" }
-            };
-            public static Dictionary<int, string> cc15730 = new Dictionary<int, string>()
-            {
-                {1559, "Forgot WiFi Password" },
-                {1083, "Customer Ticket Follow Up" },
-            };
-            public static Dictionary<int, string> cc15731 = new Dictionary<int, string>()
-            {
-                {123, "Configuration Error" },
-                {1083, "Customer Ticket Follow Up" }
-            };
-            public static Dictionary<int, string> cc1129 = new Dictionary<int, string>()
-            {
-                {165, "Customer Education" },
-                {1559, "Forgot WiFi Password" },
-                {123, "Configuration Error" },
-                {1083, "Customer Ticket Follow Up" },
-                {825, "Truck Roll" }
-            };
-            public static Dictionary<int, string> cc1400x = new Dictionary<int, string>()
-            {
-                {165, "Customer Education" },
-                {347, "Hardware/Software Failure or Configuration" },
-                {1083, "Customer Ticket Follow Up" },
-                {825, "Truck Roll" }
-            };
-            public static Dictionary<int, string> sc2804 = new Dictionary<int, string>()
-            {
-                {2804, "Cx Education Hardware/Software" }
-            };
-            public static Dictionary<int, string> sc6045 = new Dictionary<int, string>()
-            {
-                {6045, "Reconfig WiFi Security Settings" }
-            };
-            public static Dictionary<int, string> sc6092 = new Dictionary<int, string>()
-            {
-                {6092, "Toggle Bridge Mode" }
-            };
-            public static Dictionary<int, string> sc2901 = new Dictionary<int, string>()
-            {
-                {2901, "Cancelled by Phone" }
-            };
-            public static Dictionary<int, string> sc9797 = new Dictionary<int, string>()
-            {
-                {9797, "Premise Truck Roll" }
-            };
 
-            public static Dictionary<int, string> sc347 = new Dictionary<int, string>()
-            {
-                {6085, "Power Cycle Modem" },
-                {6041, "Factory Reset WG" },
-                {9671, "Reset Browser Settings" },
-                {6067, "Reconfig Mobile Device" },
-            };
-        }
-        #endregion
+
+
         #region Alarm : Class
+  
 
-        public class Alarm
-        {
-            private Dictionary<string, TimeSpan> settime = new Dictionary<string, TimeSpan>();
-            private Dictionary<string, bool> armed = new Dictionary<string, bool>();
-
-            public void SetAlarm(string Name, TimeSpan Time, bool Armed)
-            {
-                settime.Add(Name, Time);
-                armed.Add(Name, Armed);
-            }
-
-            public void AlarmOff(string Name)
-            {                
-                armed[Name] = false;
-            }
-            public void AlarmOn(string Name)
-            {
-                armed[Name] = true;
-            }
-
-            public void ChangeAlarm(string Name, TimeSpan Time)
-            {
-                settime[Name] = Time;
-            }
-
-            
-        }
-    
         #endregion
         #region Auto Replace Dictionary : Class
         public class AutoReplaceDictionary : ObservableCollection<WordPair>
         {
             public AutoReplaceDictionary() : base()
             {
-               
-        }
+                
+            }
 
             internal bool Contains(Func<object, bool> p)
             {
@@ -204,11 +80,6 @@ namespace AHT_Buddy
         {
             private string word;
             private string replaceword;
-
-            
-
-
-
             public string Word
             {
                 get { return word; }
@@ -223,231 +94,64 @@ namespace AHT_Buddy
             {
                 this.word = word;
                 this.replaceword = replaceword;
-                
+
             }
         }
-        #endregion
-        #region Call Data : Class
-  
-        public class CallData : ObservableCollection<Customer>
+        #endregion             
+        #region AutoSuggest List
+        public static class SuggestionList
         {
-            public CallData() : base() { }
-            
-        }
-        public class Customer
-        {
-            private string email;
-            private string ticket;
-            private string name;
-            private string account;
-            private string contact;
-            private string device;
-            private string issue;
-            private string resolution;
-            private string next;
-            private string attempt;
-            private bool chronic;
-            private string timestamp;
-            private int problemcode;
-            private int causecode;
-            private int solutioncode;
-            
-            public string Email { get { return email; } set { email = value; } }
-            public string Ticket { get { return ticket; } set { ticket = value; } }
-            public string Name { get { return name; } set { name = value; } }
-            public string Account { get { return account; } set { account = value; } }
-            public string Contact { get { return contact; } set { contact = value; } }
-            public string Device { get { return device; } set { device = value; } }
-            public string Issue { get { return issue; } set { issue = value; } }
-            public string Resolution { get { return resolution; } set { resolution = value; } }
-            public string Next { get { return next; } set { next = value; } }
-            public string Attempt { get { return attempt; } set { attempt = value; } }
-            public bool Chronic { get { return chronic; } set { chronic = value; } }
-            public int ProblemCode { get { return problemcode; } set { problemcode = value; } }
-            public int CauseCode { get { return causecode; } set { causecode = value; } }
-            public int SolutionCode { get { return solutioncode; } set { solutioncode = value; } }
-            public string TimeStamp { get { return timestamp; } set { timestamp = value; } }
-
-            public Customer(
-                string Email, 
-                string Ticket,
-                string Name,
-                string Account,
-                string Contact,
-                string Device,
-                string Issue,
-                string Resolution,
-                string Next,
-                string Attempt,
-                bool Chronic,
-                int ProblemCode,
-                int CauseCode,
-                int SolutionCode,
-                string TimeStamp)
+            public static List<string> Device = new List<string>
             {
-                this.email = Email;
-                this.ticket = Ticket;
-                this.name = Name;
-                this.account = Account;
-                this.contact = Contact;
-                this.device = Device;
-                this.issue = Issue;
-                this.resolution = Resolution;
-                this.next = Next;
-                this.attempt = Attempt;
-                this.Chronic = Chronic;                
-                this.problemcode = ProblemCode;
-                this.causecode = CauseCode;
-                this.solutioncode = SolutionCode;
-                this.timestamp = TimeStamp;
-            }
-            
-        }
-
-        #endregion
-        #region Wireless Gateway PoD : Class
-
-
-        public class Technicolor
-        {
-
-            public string PoD { get; set; }
-            public bool PM { get; set; }
-            public string GetPoD()
+                //Gateways
+                { "TG852G" },{"TG862G" }, { "TG1682G" }, { "DPC3939" },{ "DPC3941T" }, { "TC8350C" }, { "TC8717C" }, { "SMCD3GNV" },
+                //Routers
+                { "Linksys" }, { "Netgear" }, { "Belkin" }, { "Cisco" }, { "TP-Link" }, { "Asus" },
+                //Apple
+                { "Mac" }, { "MacBook" }, { "MacBook Pro" }, { "MacBook Air" },{ "iPad" }, { "iPhone" }, { "Apple TV" },
+                //Amazon
+                { "Kindle" }, { "Kindle Fire" }, { "Firestick" },
+                //Streaming Device
+                { "Roku" }, { "Chromecast" }, { "SlingBox" },
+                //Brands
+                { "Apple" }, { "Acer" }, { "Asus" }, { "Canon" }, { "HP" }, { "Dell" }, { "Sony" }, { "Lenovo" }, { "Samsung" },
+                { "Vizio" }, { "RCA" }, { "Brother" }, { "LG" }, { "Google" }, { "Lexmark" },
+                //Game Consoles
+                { "Wii" }, { "Wii U" }, { "PS3" }, { "PS4" }, { "Xbox One" }, { "Xbox 360" },
+                //Generic
+                { "Laptop" }, { "Desktop" }, { "Smartphone" }, { "Tablet" }, { "Printer" }, { "TV" }, { "Custom" }, { "Thermostat" }
+            };
+            public static List<string> Email = new List<string>
             {
-                int pos = 0;
-                if (!string.IsNullOrEmpty(PoD))
-                {
-                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
-
-                    if (PM == true)
-                    {
-                        DateTime NextDay = DateTime.Now;
-                        DayNum = NextDay.AddDays(1).ToString("dd-MMM-yy").ToUpper();
-                    }
-
-                    string[] sPoD = PoD.Split('\t', '\n');
-                    
-                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
-
-                    return PoD = sPoD.ElementAt(pos += 1);
-                }
-                else
-                {
-                    return PoD = "no password set";
-                }
-            }
-        }
-        public class Arris
-        {
-            
-            public string PoD { get; set; }
-            public string GetPoD()
+                { "@gmail.com" }, { "@yahoo.com" }, { "@hotmail.com" }, { "@outlook.com" }, { "@comcast.net" },
+                { "@ymail.com" }, { "@me.com" }, { "@comcast.net" }, { "@aol.com" }
+            };
+            public static List<string> Breaks = new List<string>
             {
-                int pos = 0;
-                if (!string.IsNullOrEmpty(PoD))
-                {
-                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
-
-                    string[] sPoD = PoD.Split('\t', '\n');
-                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
-
-                    return PoD = sPoD.ElementAt(pos += 1);
-                }
-                else
-                {
-                    return PoD = "no password set";
-                }
-            }
-        }
-        public class Cisco
-        {
-            public string PoD { get; set; }
-            public string GetPoD()
-            {
-                int pos = 0;
-                if (!string.IsNullOrEmpty(PoD))
-                {
-                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
-
-                    string[] sPoD = PoD.Split('\t', '\n');
-                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
-
-                    return PoD = sPoD.ElementAt(pos += 1);
-                }
-                else
-                {
-                    return PoD = "no password set";
-                }
-            }
-        }
-        public class Dory
-        {
-            
-            public string PoD { get; set; }
-            public string GetPoD()
-            {
-                int pos = 0;
-                if (!string.IsNullOrEmpty(PoD))
-                {
-                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
-
-                    string[] sPoD = PoD.Split('\t', '\n');
-                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
-
-                    return PoD = sPoD.ElementAt(pos += 1);
-                }
-                else
-                {
-                    return PoD = "no password set";
-                }
-            }
-        }
-        public class SMC
-        {
-            
-            public string PoD { get; set; }
-            public string GetPoD()
-            {
-               
-                if (!string.IsNullOrEmpty(PoD))
-                {
-                    int pos = 0;
-                    string DayNum = DateTime.Now.ToString("dd-MMM-yy").ToUpper();
-                    string[] sPoD = PoD.Split('\t', '\n');
-
-                    pos = Array.FindIndex(sPoD, row => row.Contains(DayNum));
-
-                    return PoD = sPoD.ElementAt(pos += 1);
-                }
-                else
-                {
-                    return PoD = "no password set";
-                }
-            }
+                { "Break" }, { "First Break" }, { "Second Break" }, { "Last Break"}, { "Lunch" }, { "1st Break" }, { "2nd Break" }
+            };
         }
         #endregion
         public static IEnumerable<T> FindVisualChildern<T>(DependencyObject depObj) where T : DependencyObject
         {
-            if(depObj != null)
+            if (depObj != null)
             {
-                for(int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
                 {
                     DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if(child != null && child is T)
+                    if (child != null && child is T)
                     {
                         yield return (T)child;
                     }
 
-                    foreach(T childOfDChild in FindVisualChildern<T>(child))
+                    foreach (T childOfDChild in FindVisualChildern<T>(child))
                     {
                         yield return childOfDChild;
                     }
                 }
             }
-            
         }
-        private async Task<bool> CheckFileExists(string filename) 
+        private async Task<bool> CheckFileExists(string filename)
         {
             try
             {
@@ -458,35 +162,39 @@ namespace AHT_Buddy
             {
             }
             return false;
+            
         }
-        
+
         public DispatcherTimer clock = new DispatcherTimer();
-        public static string pData = "PoDs.txt";
-        public static string lData = "WordList.txt";
-        public static string PoDpath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, pData);
-        public static string WLpath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, lData);
-        Windows.Storage.ApplicationDataContainer PoD_DataFile = Windows.Storage.ApplicationData.Current.LocalSettings;
         
+
         AutoReplaceDictionary arList = new AutoReplaceDictionary();
+        List<string> deviceSuggestion = null;
+        List<string> emailSuggestion = null;
+        List<string> breaksSuggestion = null;
+        
+
         CallData calldata = new CallData();
 
-        Technicolor technicolor = new Technicolor();
-        Arris arris = new Arris();
-        Cisco cisco = new Cisco();
-        Dory dory = new Dory();
-        SMC smc = new SMC();
-        Alarm alarm = new Alarm();         
+
+        
+        WirelessGateways.technicolor Technicolor = new WirelessGateways.technicolor();
+        WirelessGateways.arris Arris = new WirelessGateways.arris();
+        WirelessGateways.cisco Cisco = new WirelessGateways.cisco();
+        WirelessGateways.dory Dory = new WirelessGateways.dory();
+        WirelessGateways.smc SMC = new WirelessGateways.smc();
+
+        //oAlarmList oAlarm = new oAlarmList();                     
+        Alarm alarm = new Alarm();
         string GotLastWord;
         bool matched;
-        bool tcPoDsaved;
-        bool arrPoDsaved;
-        bool cisPoDsaved;
-        bool dorPoDsaved;
-        bool smcPoDsaved;
+        //bool tcPoDsaved;
+        //bool arrPoDsaved;
+        //bool cisPoDsaved;
+        //bool dorPoDsaved;
+        //bool smcPoDsaved;
         
-            
-
-     
+        
         public MainPage()
         {
             this.InitializeComponent();
@@ -500,22 +208,28 @@ namespace AHT_Buddy
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
             
-            Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
-            
+           
+        
 
+            Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
             clock.Tick += Clock_Ticker;
             clock.Interval = new TimeSpan(0, 0, 1);
-            clock.Start();            
+            clock.Start();
         }
+        #region Clock Operations
         private void Clock_Ticker(object sender, object e)
         {
             tbTime.Text = DateTime.Now.ToString("T");
+            IsTripped();
+
+           
         }
+        #endregion
         #region Remedy Code Operations
         #region Problem Code Combo Box Selection Changed
         private void comboPC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(comboPC.SelectedIndex == -1) { return; }
+            if (comboPC.SelectedIndex == -1) { return; }
 
             if (comboPC.SelectedValue.ToString() == "15003" ||
                comboPC.SelectedValue.ToString() == "15002" ||
@@ -530,26 +244,26 @@ namespace AHT_Buddy
                     comboCC.ItemsSource = code.cc1500x;
                 }
                 else { return; }
-             }
-             else if(comboPC.SelectedValue.ToString() == "1126")
+            }
+            else if (comboPC.SelectedValue.ToString() == "1126")
             {
-                if(comboCC.ItemsSource != code.cc1126)
+                if (comboCC.ItemsSource != code.cc1126)
                 {
                     comboCC.ItemsSource = code.cc1126;
                 }
                 else { return; }
             }
-            else if(comboPC.SelectedValue.ToString() == "14179")
+            else if (comboPC.SelectedValue.ToString() == "14179")
             {
-                if(comboCC.ItemsSource != code.cc14179)
+                if (comboCC.ItemsSource != code.cc14179)
                 {
                     comboCC.ItemsSource = code.cc14179;
                 }
                 else { return; }
             }
-            else if(comboPC.SelectedValue.ToString() == "15730")
+            else if (comboPC.SelectedValue.ToString() == "15730")
             {
-                if(comboCC.ItemsSource != code.cc15730)
+                if (comboCC.ItemsSource != code.cc15730)
                 {
                     comboCC.ItemsSource = code.cc15730;
                 }
@@ -557,23 +271,23 @@ namespace AHT_Buddy
             }
             else if (comboPC.SelectedValue.ToString() == "15731")
             {
-                if(comboCC.ItemsSource != code.cc15731)
+                if (comboCC.ItemsSource != code.cc15731)
                 {
                     comboCC.ItemsSource = code.cc15731;
                 }
                 else { return; }
             }
-            else if(comboPC.SelectedValue.ToString() == "1129")
+            else if (comboPC.SelectedValue.ToString() == "1129")
             {
-                if(comboCC.ItemsSource != code.cc1129)
+                if (comboCC.ItemsSource != code.cc1129)
                 {
                     comboCC.ItemsSource = code.cc1126;
                 }
                 else { return; }
             }
-            else if(comboPC.SelectedValue.ToString() == "14194" || comboPC.SelectedValue.ToString() == "14966")
+            else if (comboPC.SelectedValue.ToString() == "14194" || comboPC.SelectedValue.ToString() == "14966")
             {
-                if(comboCC.ItemsSource != code.cc1400x)
+                if (comboCC.ItemsSource != code.cc1400x)
                 {
                     comboCC.ItemsSource = code.cc1400x;
                 }
@@ -585,36 +299,36 @@ namespace AHT_Buddy
         #region Cause Code Combox Selection Changed
         private void comboCC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           if(comboCC.SelectedIndex == -1) { return; }
+            if (comboCC.SelectedIndex == -1) { return; }
 
-            if(comboCC.SelectedValue.ToString() == "165")
+            if (comboCC.SelectedValue.ToString() == "165")
             {
-                if(comboSC.ItemsSource != code.sc2804)
+                if (comboSC.ItemsSource != code.sc2804)
                 {
                     comboSC.ItemsSource = code.sc2804;
                     comboSC.SelectedIndex = 0;
                 }
                 else { return; }
             }
-            else if(comboCC.SelectedValue.ToString() == "1559")
+            else if (comboCC.SelectedValue.ToString() == "1559")
             {
-                if(comboSC.ItemsSource != code.sc6045)
+                if (comboSC.ItemsSource != code.sc6045)
                 {
                     comboSC.ItemsSource = code.sc6045;
                     comboSC.SelectedIndex = 0;
                 }
                 else { return; }
             }
-            else if(comboCC.SelectedValue.ToString() == "347")
+            else if (comboCC.SelectedValue.ToString() == "347")
             {
-                if(comboSC.ItemsSource != code.sc347)
+                if (comboSC.ItemsSource != code.sc347)
                 {
                     comboSC.ItemsSource = code.sc347;
                     comboSC.SelectedIndex = 0;
                 }
                 else { return; }
             }
-            else if(comboCC.SelectedValue.ToString() == "1083")
+            else if (comboCC.SelectedValue.ToString() == "1083")
             {
                 if (comboSC.ItemsSource != code.sc2901)
                 {
@@ -623,25 +337,25 @@ namespace AHT_Buddy
                 }
                 else { return; }
             }
-            else if(comboCC.SelectedValue.ToString() == "825")
+            else if (comboCC.SelectedValue.ToString() == "825")
             {
-                if(comboSC.ItemsSource != code.sc9797)
+                if (comboSC.ItemsSource != code.sc9797)
                 {
                     comboSC.ItemsSource = code.sc9797;
                     comboSC.SelectedIndex = 0;
                 }
                 else { return; }
             }
-            else if(comboCC.SelectedValue.ToString() == "123")
+            else if (comboCC.SelectedValue.ToString() == "123")
             {
-                if(comboSC.ItemsSource != code.sc6045)
+                if (comboSC.ItemsSource != code.sc6045)
                 {
                     comboSC.ItemsSource = code.sc6045;
                     comboSC.SelectedIndex = 0;
                 }
-                else if(comboPC.SelectedValue.ToString() == "14179")
+                else if (comboPC.SelectedValue.ToString() == "14179")
                 {
-                    if(comboSC.ItemsSource != code.sc6092)
+                    if (comboSC.ItemsSource != code.sc6092)
                     {
                         comboSC.ItemsSource = code.sc6092;
                         comboSC.SelectedIndex = 0;
@@ -657,7 +371,7 @@ namespace AHT_Buddy
         #region Solution Code Combo Box Selection Changed
         private void comboSC_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(comboSC.SelectedIndex == -1) { return; }
+            if (comboSC.SelectedIndex == -1) { return; }
             btnSolutionCode.Content = comboSC.SelectedValue;
 
         }
@@ -704,21 +418,67 @@ namespace AHT_Buddy
                 )
                 );
             tbCallCount.Text = calldata.Count().ToString();
-            
-                
-            
+
+
+
 
             foreach (TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
             {
-                tb.Text = string.Empty;                   
+                tb.Text = string.Empty;
             }
             tbIssue.Text = string.Empty;
             tbResolution.Text = string.Empty;
             tbDevice.Text = string.Empty;
         }
-        private void btnEmailCopy_Click(object sender, RoutedEventArgs e)
+        private void GetCallData_Click(object sender, RoutedEventArgs e)
         {
-            CopyToClipboard(tbEmail.Text);
+            int si = lbPreviousCallData.SelectedIndex;
+            tbEmail.Text = calldata[si].Email.ToString();
+            tbTicket.Text = calldata[si].Ticket.ToString();
+            tbName.Text = calldata[si].Name.ToString();
+            tbAccount.Text = calldata[si].Account.ToString();
+            tbContact.Text = calldata[si].Contact.ToString();
+            tbDevice.Text = calldata[si].Device.ToString();
+            tbIssue.Text = calldata[si].Issue.ToString();
+            tbResolution.Text = calldata[si].Resolution.ToString();
+            tbNext.Text = calldata[si].Next.ToString();
+            tbAttempt.Text = calldata[si].Attempt.ToString();
+            cbChronic.IsChecked = calldata[si].Chronic;
+            comboPC.SelectedIndex = calldata[si].ProblemCode;
+            comboCC.SelectedIndex = calldata[si].CauseCode;
+            comboSC.SelectedIndex = calldata[si].CauseCode;
+        }
+
+        private void Generate_Click(object sender, RoutedEventArgs e)
+        {
+            string _Date = DateTime.Now.ToString("MM/dd/yyyy");
+            string chronic;
+
+            if (cbChronic.IsChecked == true) { chronic = "Yes"; } else { chronic = "No"; }
+            if (string.IsNullOrEmpty(tbAttempt.Text))
+            {
+                tbAttempt.Text = "1";
+            }
+            if (string.IsNullOrEmpty(tbNext.Text))
+            {
+                tbNext.Text = "N/A";
+            }
+            string formatNotes =
+                "Date: {0}\n" +
+                "Ticket: {1}\n" +
+                "Cutomer Name: {2}\n" +
+                "Account Number: {3}\n" +
+                "Chronic Account: {4}\n" +
+                "Attempt Number: {5}\n" +
+                "Contact Number: (6)\n" +
+                "Affected Device: {7}\n" +
+                "Reported Issue: {8}\n" +
+                "Steps Taken to Identify and Resolve: {9}\n" +
+                "Next Action: {10}\n";
+
+            string RemedyNotes = string.Format(formatNotes, _Date, tbTicket.Text, tbName.Text, tbAccount.Text, chronic,
+                                               tbAttempt.Text, tbContact.Text, tbDevice.Text, tbIssue.Text, tbResolution.Text, tbNext.Text);
+            CopyToClipboard(RemedyNotes);
         }
         #endregion
         #region PoD Operations
@@ -733,28 +493,72 @@ namespace AHT_Buddy
                     }
                 case 0:
                     {
-                        CopyToClipboard(technicolor.GetPoD());
-                        return;
+                        if(Technicolor.GetExpiry == false)
+                        {
+                            CopyToClipboard(Technicolor.GetPoD);
+                            return;
+                        }
+                        else
+                        {
+                            _MessageBox("PoD expired!/nNo current PoD available");
+                            return;
+                        }
+                        
                     }
                 case 1:
                     {
-                        CopyToClipboard(arris.GetPoD());
-                        return;
+                        if(Arris.GetExpiry == false)
+                        {
+                            CopyToClipboard(Arris.GetPoD);
+                            return;
+                        }
+                        else
+                        {
+                            _MessageBox("PoD expired!/nNo current PoD available");
+                            return;
+                        }
+                        
                     }
                 case 2:
                     {
-                        CopyToClipboard(cisco.GetPoD());
-                        return;
+                        if(Cisco.GetExpiry == false)
+                        {
+                            CopyToClipboard(Cisco.GetPoD);
+                            return;
+                        }
+                        else
+                        {
+                            _MessageBox("PoD expired!/nNo current PoD available");
+                            return;
+                        }
+                       
                     }
                 case 3:
                     {
-                        CopyToClipboard(dory.GetPoD());
-                        return;
+                        if(Dory.GetExpiry == false)
+                        {
+                            CopyToClipboard(Dory.GetPoD);
+                            return;
+                        }
+                        else
+                        {
+                            _MessageBox("PoD expired!/nNo current PoD available");
+                            return;
+                        }
+                        
                     }
                 case 4:
                     {
-                        CopyToClipboard(smc.GetPoD());
-                        return;
+                        if(SMC.GetExpiry == false)
+                        {
+                            CopyToClipboard(SMC.GetPoD);
+                            return;
+                        }
+                        else
+                        {
+                            _MessageBox("PoD expired!/nNo current PoD available");
+                            return;
+                        }
                     }
             }
         }
@@ -762,37 +566,37 @@ namespace AHT_Buddy
         {
             if (!string.IsNullOrEmpty(tbTechnicolor.Text))
             {
-                technicolor.PoD = tbTechnicolor.Text;
-                tblockTechnicolor.Text = technicolor.GetPoD();
+                Technicolor.PoD = tbTechnicolor.Text;
+                tblockTechnicolor.Text = Technicolor.GetPoD;
             }
             if (!string.IsNullOrEmpty(tbArris.Text))
             {
-                arris.PoD = tbArris.Text;
-                tblockArris.Text = arris.GetPoD();
+                Arris.PoD = tbArris.Text;
+                tblockArris.Text = Arris.GetPoD;
             }
             if (!string.IsNullOrEmpty(tbCisco.Text))
             {
-                cisco.PoD = tbCisco.Text;
-                tblockCisco.Text = cisco.GetPoD();
+                Cisco.PoD = tbCisco.Text;
+                tblockCisco.Text = Cisco.GetPoD;
             }
             if (!string.IsNullOrEmpty(tbDory.Text))
             {
-                dory.PoD = tbDory.Text;
-                tblockDory.Text = dory.GetPoD();
+                Dory.PoD = tbDory.Text;
+                tblockDory.Text = Dory.GetPoD;
             }
             if (!string.IsNullOrEmpty(tbSMC.Text))
             {
-                smc.PoD = tbSMC.Text;
-                tblockSMC.Text = smc.GetPoD();
+                SMC.PoD = tbSMC.Text;
+                tblockSMC.Text = SMC.GetPoD;
             }
-            
-            if(!string.IsNullOrEmpty(technicolor.PoD) || 
-                !string.IsNullOrEmpty(arris.PoD) ||
-                !string.IsNullOrEmpty(cisco.PoD) ||
-                !string.IsNullOrEmpty(dory.PoD) ||
-                !string.IsNullOrEmpty(smc.PoD))
+
+            if (!string.IsNullOrEmpty(Technicolor.PoD) ||
+                !string.IsNullOrEmpty(Arris.PoD) ||
+                !string.IsNullOrEmpty(Cisco.PoD) ||
+                !string.IsNullOrEmpty(Dory.PoD) ||
+                !string.IsNullOrEmpty(SMC.PoD))
             {
-                
+
             }
 
 
@@ -800,52 +604,96 @@ namespace AHT_Buddy
 
         private void cbTechnicolorPM_Checked(object sender, RoutedEventArgs e)
         {
-            technicolor.PM = true;            
+            Technicolor.PM = true;
         }
         private void cbTechnicolorPM_Unchecked(object sender, RoutedEventArgs e)
         {
-            technicolor.PM = false;
+            Technicolor.PM = false;
         }
         #endregion
-               
-        private async void _MessageBox(string msg)
+        #region Alarm Operations
+        private void Toast (string title, string content)
         {
-            MessageDialog showDialog = new MessageDialog(msg);
-            showDialog.Commands.Add(new UICommand("Ok") { Id = 0 });
-            showDialog.DefaultCommandIndex = 0;
-            var result = await showDialog.ShowAsync();
+            
 
-            if ((int)result.Id == 0)
+            ToastVisual visual = new ToastVisual()
             {
-                return;
-            }
-            else
+                
+                BindingGeneric = new ToastBindingGeneric()
+                {
+                    
+                    Children =
+                {
+                    new AdaptiveText()
+                    {
+                        Text = title
+                    },
+
+                    new AdaptiveText()
+                    {
+                        Text = content
+                    }
+                }
+                }
+            };
+            ToastActionsCustom actions = new ToastActionsCustom()
             {
-                return;
-            }
-        }
-        private static void CopyToClipboard(string CopyString)
-        {
+                Buttons =
+                {
+                    new ToastButton("Dismiss", "{argsDismiss}")
+                    {
 
-            // Create an instance of the DataPackage and set the RequestedOperation to DataPackageOperation.Copy 
-
-            DataPackage dataPackageobj = new DataPackage
-            {
-
-                RequestedOperation = DataPackageOperation.Copy
-
+                    }
+                }
             };
 
-            // Set the Text that you want to copy 
+            ToastContent toastcontent = new ToastContent()
+            {
+                Scenario = ToastScenario.Alarm,
+                Visual = visual,
+                Actions = actions,
+            };
 
-            dataPackageobj.SetText(CopyString);
-
-            // Set the data package instance to the Clipboard 
-
-            Clipboard.SetContent(dataPackageobj);
-
+            var toast = new ToastNotification(toastcontent.GetXml());
+            toast.ExpirationTime = DateTime.Now.AddHours(1);
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
-       
+
+
+        private void IsTripped()
+        {
+            if (alarm.Count != 0)
+            {
+                for (int i = 0; i <= alarm.Count - 1; i++)
+                {
+                     if(DateTime.Parse(alarm[i].Time.ToString()).ToString("T") == DateTime.Now.ToString("T") && alarm[i].Armed == true)
+                    {
+                        alarm[i].Armed = false;
+                        Toast("Time to take your break!", alarm[i].Name);
+                    }  
+                }
+            }
+        }
+        private void btnNewAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            puAlarmSet.IsOpen = true;
+        }
+        private void SetAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            alarm.Add(new AlarmInfo(tbAlarmName.Text, DateTime.Parse(tpAlarm.Time.ToString()).ToString("hh:mm tt"), "Off"));
+            
+              
+            puAlarmSet.IsOpen = false;
+        }
+        
+
+        private void btnRemoveAlarm_Click(object sender, RoutedEventArgs e)
+        {
+          
+            alarm.RemoveAt(lbAlarms.SelectedIndex);
+        }
+        #endregion
+        #region Auto Replace Dictionary Operations
         private void AddWord()
         {
             if (string.IsNullOrEmpty(tbAddWord.Text))
@@ -882,87 +730,9 @@ namespace AHT_Buddy
         {
             AddWord();
         }
-
-        private void Toast(string msg)
-        {
-            var xmlToastTemplate = "<toast launch=\"app-defined-string\">" +
-                        "<visual>" +
-                          "<binding template =\"ToastGeneric\">" +
-                            "<text>Time for Break!</text>" +
-                           
-                          "</binding>" +
-                        "</visual>" +
-                        "<audio src=\"ms-winsoundevent:Notification.Looping.Alarm9\" Loop=\"false\"/>" +
-                      "</toast>";
-
-            // load the template as XML document
-            var xmlDocument = new Windows.Data.Xml.Dom.XmlDocument();
-            xmlDocument.LoadXml(xmlToastTemplate);
-
-            // create the toast notification and show to user
-            var toastNotification = new ToastNotification(xmlDocument);
-            var notification = ToastNotificationManager.CreateToastNotifier();
-            notification.Show(toastNotification);
-
-        }
-  
-        private void Generate_Click(object sender, RoutedEventArgs e)
-        {
-            string _Date = DateTime.Now.ToString("MM/dd/yyyy");
-            string chronic;
-
-            if (cbChronic.IsChecked == true) { chronic = "Yes"; } else { chronic = "No"; }
-            if (string.IsNullOrEmpty(tbAttempt.Text))
-            {
-                tbAttempt.Text = "1";
-            }
-            if (string.IsNullOrEmpty(tbNext.Text))
-            {
-                tbNext.Text = "N/A";
-            }
-            string formatNotes =
-                "Date: {0}\n" +
-                "Ticket: {1}\n" +
-                "Cutomer Name: {2}\n" +
-                "Account Number: {3}\n" +
-                "Chronic Account: {4}\n" +
-                "Attempt Number: {5}\n" +
-                "Contact Number: (6)\n" +
-                "Affected Device: {7}\n" +
-                "Reported Issue: {8}\n" +
-                "Steps Taken to Identify and Resolve: {9}\n" +
-                "Next Action: {10}\n";
-
-            string RemedyNotes = string.Format(formatNotes, _Date, tbTicket.Text, tbName.Text, tbAccount.Text, chronic,
-                                               tbAttempt.Text, tbContact.Text, tbDevice.Text, tbIssue.Text, tbResolution.Text, tbNext.Text);
-            CopyToClipboard(RemedyNotes);
-        }
-
-   
-        private void GetCallData_Click(object sender, RoutedEventArgs e)
-        {
-            int si = lbPreviousCallData.SelectedIndex;
-            tbEmail.Text = calldata[si].Email.ToString();
-            tbTicket.Text = calldata[si].Ticket.ToString();
-            tbName.Text = calldata[si].Name.ToString();
-            tbAccount.Text = calldata[si].Account.ToString();
-            tbContact.Text = calldata[si].Contact.ToString();
-            tbDevice.Text = calldata[si].Device.ToString();
-            tbIssue.Text = calldata[si].Issue.ToString();
-            tbResolution.Text = calldata[si].Resolution.ToString();
-            tbNext.Text = calldata[si].Next.ToString();
-            tbAttempt.Text = calldata[si].Attempt.ToString();
-            cbChronic.IsChecked = calldata[si].Chronic;
-            comboPC.SelectedIndex= calldata[si].ProblemCode;
-            comboCC.SelectedIndex = calldata[si].CauseCode;
-            comboSC.SelectedIndex = calldata[si].CauseCode;
-        }
         private void AutoReplace(TextBox txt)
         {
-           
-            //string ReplaceWord;
-            
-            int lastword = txt.Text.LastIndexOf(" ");            
+            int lastword = txt.Text.LastIndexOf(" ");
 
             lastword += 1;
             GotLastWord = txt.Text.Substring(lastword);
@@ -976,7 +746,7 @@ namespace AHT_Buddy
 
                 lbAutoReplace.Items.Clear();
                 lbAutoReplace.Items.Add(wList[wordIndex].ReplaceWord);
-                
+
 
                 lbAutoReplace.SelectedIndex = 0;
                 txt.SelectionStart = txt.Text.Length;
@@ -984,90 +754,197 @@ namespace AHT_Buddy
                 popupAR.VerticalOffset = elementbound.Bottom;
                 popupAR.HorizontalOffset = elementbound.Left + txt.SelectionStart;
                 matched = true;
-                popupAR.IsOpen = true;        
+                popupAR.IsOpen = true;
             }
         }
-
-        private void tbIssue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            AutoReplace(tbIssue);
-            
-        }
-
-        private void tbEmail_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
-        
         private void tbAddWord_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if(e.Key == VirtualKey.Enter)
+            if (e.Key == VirtualKey.Enter)
             {
                 AddWord();
                 e.Handled = true;
             }
 
         }
-
-        private void lbAutoReplace_KeyUp(object sender, KeyRoutedEventArgs e)
+        private void btnRemoveWord_Click(object sender, RoutedEventArgs e)
         {
-   
+            arList.RemoveAt(AutoReplaceList.SelectedIndex);
+        }
+
+        #endregion
+
+        private void btnEmailCopy_Click(object sender, RoutedEventArgs e)
+        {
+            CopyToClipboard(tbEmail.Text);
+        }
+        private async void _MessageBox(string msg)
+        {
+            MessageDialog showDialog = new MessageDialog(msg);
+            showDialog.Commands.Add(new UICommand("Ok") { Id = 0 });
+            showDialog.DefaultCommandIndex = 0;
+            var result = await showDialog.ShowAsync();
+
+            if ((int)result.Id == 0)
+            {
+                return;
+            }
+            else
+            {
+                return;
+            }
+        }
+        private static void CopyToClipboard(string CopyString)
+        {
+            // Create an instance of the DataPackage and set the RequestedOperation to DataPackageOperation.Copy 
+            DataPackage dataPackageobj = new DataPackage
+            {
+                RequestedOperation = DataPackageOperation.Copy
+            };
+            // Set the Text that you want to copy 
+            dataPackageobj.SetText(CopyString);
+            // Set the data package instance to the Clipboard 
+            Clipboard.SetContent(dataPackageobj);
+        }
+
+        private void tbIssue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            AutoReplace(tbIssue);
         }
 
         private void tbIssue_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-
+            arKeyDown(tbIssue, e);
+        }
+        private void tbResolution_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            AutoReplace(tbResolution);
+        }
+        private void tbResolution_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            arKeyDown(tbResolution, e);
+        }
+        private void arKeyDown(TextBox txt, KeyRoutedEventArgs e)
+        {
             if (string.IsNullOrEmpty(GotLastWord))
             {
                 return;
             }
             else if (matched && e.Key == VirtualKey.Enter)
-            {                
-                int lastword = tbIssue.Text.LastIndexOf(GotLastWord);                
-                tbIssue.Text = tbIssue.Text.Remove(lastword, GotLastWord.Length).Insert(lastword, lbAutoReplace.Items[0].ToString());                
-                tbIssue.SelectionStart = tbIssue.Text.Length + 1;
+            {
+                int lastword = txt.Text.LastIndexOf(GotLastWord);
+                txt.Text = txt.Text.Remove(lastword, GotLastWord.Length).Insert(lastword, lbAutoReplace.Items[0].ToString());
+                txt.SelectionStart = txt.Text.Length + 1;
                 popupAR.IsOpen = false;
             }
-            else if(matched && e.Key == VirtualKey.Space)
+            else if (matched && e.Key == VirtualKey.Space)
             {
                 popupAR.IsOpen = false;
             }
         }
 
-        private void tbDevice_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void tbDevice_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if(args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            if (args.ChosenSuggestion != null)
             {
-
+                tbDevice.Text = args.ChosenSuggestion.ToString();
             }
         }
 
         private void tbDevice_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem;
         }
 
-        private void tbDevice_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void tbDevice_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                deviceSuggestion = SuggestionList.Device.Where(x => x.StartsWith(sender.Text)).ToList();
+                sender.ItemsSource = deviceSuggestion;
+            }
+        }
+        
+        private void tbEmail_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if(args.ChosenSuggestion != null)
+            {
+                tbEmail.Text = args.ChosenSuggestion.ToString();
+            }
         }
 
-        private void btnPoDcopy_Copy_Click(object sender, RoutedEventArgs e)
+        private void tbEmail_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            arList.RemoveAt(AutoReplaceList.SelectedIndex);
-
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = sender.Text.Replace("@", selectedItem);
         }
 
-    
-        private void btnRemoveWord_Click(object sender, RoutedEventArgs e)
+        private void tbEmail_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            arList.RemoveAt(AutoReplaceList.SelectedIndex);
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                string LastChar = string.Empty;
+                if (!string.IsNullOrEmpty(sender.Text)) { LastChar = sender.Text.Substring(sender.Text.Length - 1); }
+                emailSuggestion = SuggestionList.Email.Where(x => x.StartsWith(LastChar)).ToList();
+                sender.ItemsSource = emailSuggestion;
+            }
+        }
+
+        private void tbAlarmName_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem;
+        }
+
+        private void tbAlarmName_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if(args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                breaksSuggestion = SuggestionList.Breaks.Where(x => x.StartsWith(sender.Text)).ToList();
+                sender.ItemsSource = breaksSuggestion;
+            }
+        }
+
+        private void tbAlarmName_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                tbAlarmName.Text = args.ChosenSuggestion.ToString();
+            }
+        }
+
+        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+          
+        }
+
+   
+
+        private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            
             
         }
 
-        private void btnNewAlarm_Click(object sender, RoutedEventArgs e)
+        private void lbAlarms_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            
+        }
+
+        private void lbAlarmToggleSwitch_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            
+        }
+
+        private void lbAlarms_PointerEntered_1(object sender, PointerRoutedEventArgs e)
         {
 
         }
+
+        private void ToggleSwitch_Toggled_1(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }
+
