@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -59,16 +60,12 @@ namespace AHT_Buddy
 
 
 
-        #region Alarm : Class
-  
-
-        #endregion
         #region Auto Replace Dictionary : Class
         public class AutoReplaceDictionary : ObservableCollection<WordPair>
         {
             public AutoReplaceDictionary() : base()
             {
-                
+
             }
 
             internal bool Contains(Func<object, bool> p)
@@ -162,22 +159,22 @@ namespace AHT_Buddy
             {
             }
             return false;
-            
+
         }
 
         public DispatcherTimer clock = new DispatcherTimer();
-        
+
 
         AutoReplaceDictionary arList = new AutoReplaceDictionary();
         List<string> deviceSuggestion = null;
         List<string> emailSuggestion = null;
         List<string> breaksSuggestion = null;
-        
+        List<string> SortedAlarm = new List<string>();
 
         CallData calldata = new CallData();
 
 
-        
+
         WirelessGateways.technicolor Technicolor = new WirelessGateways.technicolor();
         WirelessGateways.arris Arris = new WirelessGateways.arris();
         WirelessGateways.cisco Cisco = new WirelessGateways.cisco();
@@ -186,17 +183,23 @@ namespace AHT_Buddy
 
         //oAlarmList oAlarm = new oAlarmList();                     
         Alarm alarm = new Alarm();
+        
         string GotLastWord;
+        string InsertWord;
         bool matched;
         //bool tcPoDsaved;
         //bool arrPoDsaved;
         //bool cisPoDsaved;
         //bool dorPoDsaved;
         //bool smcPoDsaved;
-        
-        
+        int wordcount;
+
         public MainPage()
         {
+            clock.Tick += Clock_Ticker;
+            clock.Interval = new TimeSpan(0, 0, 1);
+            clock.Start();
+
             this.InitializeComponent();
 
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
@@ -207,22 +210,21 @@ namespace AHT_Buddy
             comboSC.DisplayMemberPath = "Value";
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
-            
-           
-        
+
+
+
 
             Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
-            clock.Tick += Clock_Ticker;
-            clock.Interval = new TimeSpan(0, 0, 1);
-            clock.Start();
+
         }
         #region Clock Operations
         private void Clock_Ticker(object sender, object e)
         {
             tbTime.Text = DateTime.Now.ToString("T");
+            
             IsTripped();
+            displayAlarm();
 
-           
         }
         #endregion
         #region Remedy Code Operations
@@ -378,27 +380,68 @@ namespace AHT_Buddy
         #endregion
         #endregion
         #region Call Operations
+        private SolidColorBrush GetSolidColorBrush(string hex)
+        {
+            hex = hex.Replace("#", string.Empty);
+            byte a = (byte)(Convert.ToUInt32(hex.Substring(0, 2), 16));
+            byte r = (byte)(Convert.ToUInt32(hex.Substring(2, 2), 16));
+            byte g = (byte)(Convert.ToUInt32(hex.Substring(4, 2), 16));
+            byte b = (byte)(Convert.ToUInt32(hex.Substring(6, 2), 16));
+            SolidColorBrush myBrush = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+            return myBrush;
+        }
+
         private void NewCall_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(tbEmail.Text) &&
-               string.IsNullOrEmpty(tbTicket.Text) &&
-               string.IsNullOrEmpty(tbName.Text) &&
-               string.IsNullOrEmpty(tbAccount.Text) &&
-               string.IsNullOrEmpty(tbContact.Text) &&
-               string.IsNullOrEmpty(tbDevice.Text) &&
-               string.IsNullOrEmpty(tbIssue.Text) &&
-               string.IsNullOrEmpty(tbResolution.Text))
+            if (string.IsNullOrEmpty(tbEmail.Text))
             {
+                tbEmail.Text = "No Email Captured";
+            }
+            if (string.IsNullOrEmpty(tbAttempt.Text))
+            {
+                tbAttempt.Text = "1";
+            }
+            if (string.IsNullOrEmpty(tbNext.Text))
+            {
+                tbNext.Text = "N/A";
+            }
+            foreach (TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
+            {
+                if (string.IsNullOrEmpty(tb.Text))
+                {
+                    
+                    tb.BorderBrush = new SolidColorBrush(Colors.Red);
+                    return;
+                }
+                else
+                {
+                    tb.BorderBrush = GetSolidColorBrush("#FF7A7A7A");
+                }
+                
+            }
+            if (string.IsNullOrEmpty(tbIssue.Text))
+            {
+                tbIssue.BorderBrush = new SolidColorBrush(Colors.Red);
                 return;
             }
             else
             {
-                SaveCallData();
+                tbIssue.BorderBrush = GetSolidColorBrush("#FF7A7A7A");
             }
+            if (string.IsNullOrEmpty(tbResolution.Text))
+            {
+                tbResolution.BorderBrush = new SolidColorBrush(Colors.Red);
+                return;
+            }
+            else
+            {
+                tbResolution.BorderBrush = GetSolidColorBrush("#FF7A7A7A");
+            }
+
+            SaveCallData();
         }
         private void SaveCallData()
         {
-
             calldata.Add(new Customer(
                 tbEmail.Text,
                 tbTicket.Text,
@@ -419,9 +462,6 @@ namespace AHT_Buddy
                 );
             tbCallCount.Text = calldata.Count().ToString();
 
-
-
-
             foreach (TextBox tb in FindVisualChildern<TextBox>(CxDataGrid))
             {
                 tb.Text = string.Empty;
@@ -432,21 +472,29 @@ namespace AHT_Buddy
         }
         private void GetCallData_Click(object sender, RoutedEventArgs e)
         {
-            int si = lbPreviousCallData.SelectedIndex;
-            tbEmail.Text = calldata[si].Email.ToString();
-            tbTicket.Text = calldata[si].Ticket.ToString();
-            tbName.Text = calldata[si].Name.ToString();
-            tbAccount.Text = calldata[si].Account.ToString();
-            tbContact.Text = calldata[si].Contact.ToString();
-            tbDevice.Text = calldata[si].Device.ToString();
-            tbIssue.Text = calldata[si].Issue.ToString();
-            tbResolution.Text = calldata[si].Resolution.ToString();
-            tbNext.Text = calldata[si].Next.ToString();
-            tbAttempt.Text = calldata[si].Attempt.ToString();
-            cbChronic.IsChecked = calldata[si].Chronic;
-            comboPC.SelectedIndex = calldata[si].ProblemCode;
-            comboCC.SelectedIndex = calldata[si].CauseCode;
-            comboSC.SelectedIndex = calldata[si].CauseCode;
+            if (calldata.Count != 0)
+            {
+                int si = lbPreviousCallData.SelectedIndex;
+                tbEmail.Text = calldata[si].Email.ToString();
+                tbTicket.Text = calldata[si].Ticket.ToString();
+                tbName.Text = calldata[si].Name.ToString();
+                tbAccount.Text = calldata[si].Account.ToString();
+                tbContact.Text = calldata[si].Contact.ToString();
+                tbDevice.Text = calldata[si].Device.ToString();
+                tbIssue.Text = calldata[si].Issue.ToString();
+                tbResolution.Text = calldata[si].Resolution.ToString();
+                tbNext.Text = calldata[si].Next.ToString();
+                tbAttempt.Text = calldata[si].Attempt.ToString();
+                cbChronic.IsChecked = calldata[si].Chronic;
+                comboPC.SelectedIndex = calldata[si].ProblemCode;
+                comboCC.SelectedIndex = calldata[si].CauseCode;
+                comboSC.SelectedIndex = calldata[si].CauseCode;
+            }
+            else
+            {
+                return;
+            }
+
         }
 
         private void Generate_Click(object sender, RoutedEventArgs e)
@@ -493,7 +541,7 @@ namespace AHT_Buddy
                     }
                 case 0:
                     {
-                        if(Technicolor.GetExpiry == false)
+                        if (Technicolor.GetExpiry == false)
                         {
                             CopyToClipboard(Technicolor.GetPoD);
                             return;
@@ -503,11 +551,11 @@ namespace AHT_Buddy
                             _MessageBox("PoD expired!/nNo current PoD available");
                             return;
                         }
-                        
+
                     }
                 case 1:
                     {
-                        if(Arris.GetExpiry == false)
+                        if (Arris.GetExpiry == false)
                         {
                             CopyToClipboard(Arris.GetPoD);
                             return;
@@ -517,11 +565,11 @@ namespace AHT_Buddy
                             _MessageBox("PoD expired!/nNo current PoD available");
                             return;
                         }
-                        
+
                     }
                 case 2:
                     {
-                        if(Cisco.GetExpiry == false)
+                        if (Cisco.GetExpiry == false)
                         {
                             CopyToClipboard(Cisco.GetPoD);
                             return;
@@ -531,11 +579,11 @@ namespace AHT_Buddy
                             _MessageBox("PoD expired!/nNo current PoD available");
                             return;
                         }
-                       
+
                     }
                 case 3:
                     {
-                        if(Dory.GetExpiry == false)
+                        if (Dory.GetExpiry == false)
                         {
                             CopyToClipboard(Dory.GetPoD);
                             return;
@@ -545,11 +593,11 @@ namespace AHT_Buddy
                             _MessageBox("PoD expired!/nNo current PoD available");
                             return;
                         }
-                        
+
                     }
                 case 4:
                     {
-                        if(SMC.GetExpiry == false)
+                        if (SMC.GetExpiry == false)
                         {
                             CopyToClipboard(SMC.GetPoD);
                             return;
@@ -612,16 +660,124 @@ namespace AHT_Buddy
         }
         #endregion
         #region Alarm Operations
-        private void Toast (string title, string content)
+
+        private void displayAlarm()
         {
-            
+            if(alarm.Count != 0)
+            {
+                for (int i = 0; i <= alarm.Count - 1; i++)
+                {
+                    if (alarm[i].Armed == true)
+                    {
+                        SortedAlarm.Clear();
+                        SortedAlarm.Add(DateTime.Parse(alarm[i].Time).ToString("HH:mm"));
+                    }
+                }
+                SortedAlarm.Sort();
+                if(SortedAlarm.Count != 0)
+                {
+                    tbCurrentAlarm.Text = DateTime.Parse(SortedAlarm[0]).ToString("hh:mm tt");
+                }                
+            }          
+        }
+        private void tbAlarmName_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem;
+        }
+
+        private void tbAlarmName_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                breaksSuggestion = SuggestionList.Breaks.Where(x => x.StartsWith(sender.Text)).ToList();
+                sender.ItemsSource = breaksSuggestion;
+            }
+        }
+
+        private void tbAlarmName_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                tbAlarmName.Text = args.ChosenSuggestion.ToString();
+            }
+        }
+
+        private void btnChangeAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            if (lbAlarms.SelectedIndex != -1)
+            {
+                tbChangeAlarmName.Text = alarm[lbAlarms.SelectedIndex].Name;
+                tpAlarmChange.Time = TimeSpan.Parse(DateTime.Parse(alarm[lbAlarms.SelectedIndex].Time).ToString("HH:mm"));
+                popupChangeAlarm.IsOpen = true;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void ChangeAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            int si = lbAlarms.SelectedIndex;
+
+            if (tbChangeAlarmName.Text == alarm[si].Name && DateTime.Parse(tpAlarmChange.Time.ToString()).ToString("T") == alarm[si].Time)
+            {
+                return;
+            }
+            else
+            {
+                if (tbChangeAlarmName.Text != alarm[si].Name)
+                {
+                    alarm[si].Name = tbChangeAlarmName.Text;
+                }
+                else
+                {
+                    return;
+                }
+                if (DateTime.Parse(tpAlarmChange.Time.ToString()).ToString("T") != alarm[si].Time)
+                {
+                    alarm[si].Time = DateTime.Parse(tpAlarmChange.Time.ToString()).ToString("T");
+                }
+                else
+                {
+                    return;
+                }
+            }
+            popupChangeAlarm.IsOpen = false;
+
+        }
+
+        private void popupChangeAlarm_LostFocus(object sender, RoutedEventArgs e)
+        {
+            popupChangeAlarm.IsOpen = false;
+        }
+
+        private void puAlarmSet_LostFocus(object sender, RoutedEventArgs e)
+        {
+            puAlarmSet.IsOpen = false;
+        }
+
+        private void CancelChangeAlarm_Click(object sender, RoutedEventArgs e)
+        {
+            popupChangeAlarm.IsOpen = false;
+        }
+
+        private void CancelSetAlarm(object sender, RoutedEventArgs e)
+        {
+            puAlarmSet.IsOpen = false;
+        }
+    
+    private void Toast(string title, string content)
+        {
+
 
             ToastVisual visual = new ToastVisual()
             {
-                
+
                 BindingGeneric = new ToastBindingGeneric()
                 {
-                    
+
                     Children =
                 {
                     new AdaptiveText()
@@ -666,11 +822,11 @@ namespace AHT_Buddy
             {
                 for (int i = 0; i <= alarm.Count - 1; i++)
                 {
-                     if(DateTime.Parse(alarm[i].Time.ToString()).ToString("T") == DateTime.Now.ToString("T") && alarm[i].Armed == true)
+                    if (DateTime.Parse(alarm[i].Time.ToString()).ToString("T") == DateTime.Now.ToString("T") && alarm[i].Armed == true)
                     {
                         alarm[i].Armed = false;
                         Toast("Time to take your break!", alarm[i].Name);
-                    }  
+                    }
                 }
             }
         }
@@ -681,47 +837,36 @@ namespace AHT_Buddy
         private void SetAlarm_Click(object sender, RoutedEventArgs e)
         {
             alarm.Add(new AlarmInfo(tbAlarmName.Text, DateTime.Parse(tpAlarm.Time.ToString()).ToString("hh:mm tt"), "Off"));
-            
-              
+
+
             puAlarmSet.IsOpen = false;
         }
-        
+
 
         private void btnRemoveAlarm_Click(object sender, RoutedEventArgs e)
         {
-          
+
             alarm.RemoveAt(lbAlarms.SelectedIndex);
         }
         #endregion
         #region Auto Replace Dictionary Operations
         private void AddWord()
         {
-            if (string.IsNullOrEmpty(tbAddWord.Text))
+            if (string.IsNullOrEmpty(tbAddWord.Text) || string.IsNullOrEmpty(tbAddWordReplacement.Text))
             {
                 return;
             }
             else
             {
-                bool containsDelimiter = tbAddWord.Text.Contains("==");
-
-                string[] SplitString = tbAddWord.Text.Split(new string[] { "==" }, StringSplitOptions.None);
-
-                if (!arList.Any(w => w.Word == SplitString[0]) && containsDelimiter == true)
+                if (!arList.Any(w => w.Word == tbAddWord.Text))
                 {
-                    arList.Add(new WordPair(SplitString[0], SplitString[1]));
+                    arList.Add(new WordPair(tbAddWord.Text, tbAddWordReplacement.Text));
                     tbAddWord.Text = string.Empty;
                 }
                 else
                 {
-                    if (containsDelimiter == false)
-                    {
-                        _MessageBox("Dictionary entries must use the ~~ delimiter to separate your Words!");
-                    }
-                    else
-                    {
-                        _MessageBox("This Key:Value pair " + SplitString[0] + "~~" + SplitString[1] + " " + "\nIs already in the Dictionary!");
-                    }
-
+                     _MessageBox("This Key:Value pair " + tbAddWord.Text + " :: " + tbAddWordReplacement.Text + " " + "\nIs already in the Dictionary!");
+                    
                 }
             }
         }
@@ -736,36 +881,27 @@ namespace AHT_Buddy
 
             lastword += 1;
             GotLastWord = txt.Text.Substring(lastword);
-
-            var wList = arList.ToList();
             
+            var wList = arList.ToList();
+
             if (wList.Exists(x => x.Word == GotLastWord))
             {
                 int wordIndex = wList.IndexOf(wList.Where(w => w.Word == GotLastWord).FirstOrDefault());
                 txt.SelectionStart = txt.Text.Length;
-
+                wordcount = txt.Text.Length;
                 lbAutoReplace.Items.Clear();
                 lbAutoReplace.Items.Add(wList[wordIndex].ReplaceWord);
-
+                InsertWord = wList[wordIndex].ReplaceWord;
 
                 lbAutoReplace.SelectedIndex = 0;
                 txt.SelectionStart = txt.Text.Length;
-                var elementbound = tbIssue.GetElementBounds(this);
+                var elementbound = txt.GetElementBounds(this);
                 popupAR.VerticalOffset = elementbound.Bottom;
                 popupAR.HorizontalOffset = elementbound.Left + txt.SelectionStart;
                 matched = true;
                 popupAR.IsOpen = true;
             }
-        }
-        private void tbAddWord_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == VirtualKey.Enter)
-            {
-                AddWord();
-                e.Handled = true;
-            }
-
-        }
+        }  
         private void btnRemoveWord_Click(object sender, RoutedEventArgs e)
         {
             arList.RemoveAt(AutoReplaceList.SelectedIndex);
@@ -775,7 +911,8 @@ namespace AHT_Buddy
 
         private void btnEmailCopy_Click(object sender, RoutedEventArgs e)
         {
-            CopyToClipboard(tbEmail.Text);
+            TextBox txt = sender as TextBox;
+            CopyToClipboard(txt.Text);
         }
         private async void _MessageBox(string msg)
         {
@@ -809,16 +946,17 @@ namespace AHT_Buddy
         private void tbIssue_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
             AutoReplace(tbIssue);
+            if(tbIssue.Text.Length != wordcount)
+            {
+                popupAR.IsOpen = false;
+            }
         }
 
         private void tbIssue_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             arKeyDown(tbIssue, e);
         }
-        private void tbResolution_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            AutoReplace(tbResolution);
-        }
+        
         private void tbResolution_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             arKeyDown(tbResolution, e);
@@ -832,7 +970,8 @@ namespace AHT_Buddy
             else if (matched && e.Key == VirtualKey.Enter)
             {
                 int lastword = txt.Text.LastIndexOf(GotLastWord);
-                txt.Text = txt.Text.Remove(lastword, GotLastWord.Length).Insert(lastword, lbAutoReplace.Items[0].ToString());
+          
+                txt.Text = txt.Text.Remove(lastword, GotLastWord.Length).Insert(lastword, InsertWord);
                 txt.SelectionStart = txt.Text.Length + 1;
                 popupAR.IsOpen = false;
             }
@@ -864,10 +1003,10 @@ namespace AHT_Buddy
                 sender.ItemsSource = deviceSuggestion;
             }
         }
-        
+
         private void tbEmail_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if(args.ChosenSuggestion != null)
+            if (args.ChosenSuggestion != null)
             {
                 tbEmail.Text = args.ChosenSuggestion.ToString();
             }
@@ -890,60 +1029,41 @@ namespace AHT_Buddy
             }
         }
 
-        private void tbAlarmName_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        private void tbContact_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var selectedItem = args.SelectedItem.ToString();
-            sender.Text = selectedItem;
+            string numericPhone = new string(tbContact.Text.ToCharArray().Where(c => Char.IsDigit(c)).ToArray());
+            tbContact.Text = string.Format("(###) ### - ####", numericPhone);
         }
 
-        private void tbAlarmName_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        
+
+        private void tbResolution_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if(args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
-            {
-                breaksSuggestion = SuggestionList.Breaks.Where(x => x.StartsWith(sender.Text)).ToList();
-                sender.ItemsSource = breaksSuggestion;
-            }
+            AutoReplace(tbResolution);
+           
         }
 
-        private void tbAlarmName_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private void tbIssue_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (args.ChosenSuggestion != null)
-            {
-                tbAlarmName.Text = args.ChosenSuggestion.ToString();
-            }
-        }
-
-        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
+            AutoReplace(tbIssue);
           
         }
 
-   
-
-        private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void tbAddWord_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            
-            
-        }
-
-        private void lbAlarms_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            
-        }
-
-        private void lbAlarmToggleSwitch_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            
-        }
-
-        private void lbAlarms_PointerEntered_1(object sender, PointerRoutedEventArgs e)
-        {
-
-        }
-
-        private void ToggleSwitch_Toggled_1(object sender, RoutedEventArgs e)
-        {
-            
+            if(e.Key == VirtualKey.Enter)
+            {
+                if(FocusManager.GetFocusedElement() == tbAddWord)
+                {
+                    FocusManager.TryMoveFocus(FocusNavigationDirection.Next);
+                    FocusManager.TryMoveFocus(FocusNavigationDirection.Next);
+                }
+                else
+                {
+                    FocusManager.TryMoveFocus(FocusNavigationDirection.Next);
+                }
+                e.Handled = true;
+            }
         }
     }
 }

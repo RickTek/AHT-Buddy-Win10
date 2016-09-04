@@ -26,12 +26,12 @@ namespace AHT_Buddy
         public string Name
         {
             get { return name; }
-            set { name = value; }
+            set { name = value; OnPropertyChanged("Name"); }
         }
         public string Time
         {
             get { return time; }
-            set { time = value; }
+            set { time = value; OnPropertyChanged("Time"); }
         }
         public bool Armed
         {

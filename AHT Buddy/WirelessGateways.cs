@@ -80,7 +80,7 @@ namespace AHT_Buddy
             public string PoD
             {
                 get { return technicolorPoD; }
-                set { technicolorPoD = PoD; }
+                set { technicolorPoD = value; }
             }
             public string GetPoD
             {
@@ -102,7 +102,7 @@ namespace AHT_Buddy
             public string PoD
             {
                 get { return arrisPoD; }
-                set { arrisPoD = PoD; }
+                set { arrisPoD = value; }
             }
             public string GetPoD
             {
@@ -118,7 +118,7 @@ namespace AHT_Buddy
             public string PoD
             {
                 get { return ciscoPoD; }
-                set { ciscoPoD = PoD; }
+                set { ciscoPoD = value; }
             }
             public string GetPoD
             {
@@ -134,7 +134,7 @@ namespace AHT_Buddy
             public string PoD
             {
                 get { return doryPoD; }
-                set { doryPoD = PoD; }
+                set { doryPoD = value; }
             }
             public string GetPoD
             {
@@ -150,7 +150,7 @@ namespace AHT_Buddy
             public string PoD
             {
                 get { return smcPoD; }
-                set { smcPoD = PoD; }
+                set { smcPoD = value; }
             }
             public string GetPoD
             {
