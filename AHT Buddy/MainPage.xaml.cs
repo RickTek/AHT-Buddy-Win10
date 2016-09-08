@@ -27,6 +27,9 @@ using System.Text.RegularExpressions;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Xml.Linq;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using Windows.Storage.Streams;
+using Newtonsoft.Json;
 
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
@@ -173,7 +176,7 @@ namespace AHT_Buddy
 
         CallData calldata = new CallData();
 
-
+        
 
         WirelessGateways.technicolor Technicolor = new WirelessGateways.technicolor();
         WirelessGateways.arris Arris = new WirelessGateways.arris();
@@ -181,27 +184,41 @@ namespace AHT_Buddy
         WirelessGateways.dory Dory = new WirelessGateways.dory();
         WirelessGateways.smc SMC = new WirelessGateways.smc();
 
-        //oAlarmList oAlarm = new oAlarmList();                     
+
+        StorageFolder AHTBuddy = ApplicationData.Current.LocalFolder;
+
+        string Technicolor_file = "Technicolor.txt";
+        string Arris_file = "Arris.txt";
+        string Cisco_file = "Cisco.txt";
+        string Dory_file = "Dory.txt";
+        string SMC_file = "SMC.txt";
+
+
+        string WordList_file = "WordList.dat";
+        ApplicationDataContainer AppSettings = ApplicationData.Current.LocalSettings;
+        
+
+
         Alarm alarm = new Alarm();
         
         string GotLastWord;
         string InsertWord;
         bool matched;
-        //bool tcPoDsaved;
-        //bool arrPoDsaved;
-        //bool cisPoDsaved;
-        //bool dorPoDsaved;
-        //bool smcPoDsaved;
         int wordcount;
+        int WordPairCount;
+        
 
         public MainPage()
         {
             clock.Tick += Clock_Ticker;
             clock.Interval = new TimeSpan(0, 0, 1);
             clock.Start();
+            AppSettings.Values["WordPairCount"] = WordPairCount;
 
+            Loaded += Page_Loaded;
             this.InitializeComponent();
 
+            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
@@ -211,12 +228,134 @@ namespace AHT_Buddy
             comboSC.SelectedValuePath = "Key";
             comboPC.SelectedValue = -1;
 
-
-
-
             Main_Pivot.SelectedItem = Cx_PivotItem; //Set Customer Data as opening pivot page
 
         }
+        #region File Operations
+        
+        async void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)
+        {
+            try
+            {
+                await SaveData(Technicolor_file, tbTechnicolor.Text, false);
+                await SaveData(Arris_file, tbArris.Text, false);
+                await SaveData(Cisco_file, tbCisco.Text, false);
+                await SaveData(Dory_file, tbDory.Text, false);
+                await SaveData(SMC_file, tbSMC.Text, false);
+                await SaveData(WordList_file, string.Empty, true);
+            }
+            catch { }
+            
+            
+        }
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            ApplicationDataContainer AppSettings = ApplicationData.Current.LocalSettings;
+
+            try
+            {
+                await LoadData(WordList_file, true);
+            }
+            catch { }
+            try
+            {
+                tbTechnicolor.Text = await LoadData(Technicolor_file, false);
+                tbArris.Text = await LoadData(Arris_file, false);
+                tbCisco.Text = await LoadData(Cisco_file, false);
+                tbDory.Text = await LoadData(Cisco_file, false);
+                tbSMC.Text = await LoadData(SMC_file, false);
+            }
+            catch
+            {
+
+            }
+            
+        }
+
+        private async Task SaveWordList(AutoReplaceDictionary arlist)
+        {
+            try
+            {
+                StorageFile savedStuffFile =
+                    await ApplicationData.Current.LocalFolder.CreateFileAsync("WordPairs.dat", CreationCollisionOption.ReplaceExisting);
+
+                using (Stream writeStream =
+                    await savedStuffFile.OpenStreamForWriteAsync())
+                {
+                    DataContractSerializer stuffSerializer =
+                        new DataContractSerializer(typeof(AutoReplaceDictionary));
+
+                    stuffSerializer.WriteObject(writeStream, arlist);
+                    await writeStream.FlushAsync();
+                    writeStream.Dispose();
+                }
+                
+            }
+            catch (Exception e)
+            {
+                throw new Exception("ERROR: Cannot save Dictionary Data!", e);
+            }
+        }
+
+
+        private async Task SaveData(string FileName, string TextFile, bool IsList)
+        {
+
+            if (IsList == false)
+            {
+                StorageFile storagefile = await AHTBuddy.CreateFileAsync(FileName, CreationCollisionOption.ReplaceExisting);
+                storagefile = await AHTBuddy.GetFileAsync(FileName);
+                await FileIO.WriteTextAsync(storagefile, TextFile);
+            }
+            else
+            {
+                await SaveWordList(this.arList);
+            }
+          
+        }
+        private async Task<string> LoadData(string FileName, bool IsList)
+        {
+            FileInfo fInfo = new FileInfo(FileName);
+            if (fInfo.Exists)
+            {
+                if (IsList == false)
+                {
+                    StorageFile file = await AHTBuddy.GetFileAsync(FileName);
+
+
+                    return await FileIO.ReadTextAsync(file);
+                }
+                else
+                {
+                    StorageFile file = await AHTBuddy.CreateFileAsync(FileName, CreationCollisionOption.ReplaceExisting);
+
+                    using (var stream = await file.OpenStreamForReadAsync())
+                    {
+                        string text;
+                        using (var reader = new StreamReader(stream))
+                        {
+                            text = await reader.ReadToEndAsync();
+                        }
+                        var wordlist = JsonConvert.DeserializeObject<WordPair>(text);
+                        arList.Add(wordlist);
+                    }
+
+
+                    using (IInputStream inStream = await file.OpenSequentialReadAsync())
+                    {
+                        DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<WordPair>));
+                        var data = (ObservableCollection<WordPair>)serializer.ReadObject(inStream.AsStreamForRead());
+                    }
+                    return string.Empty;
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
+            
+        }
+        #endregion
         #region Clock Operations
         private void Clock_Ticker(object sender, object e)
         {
@@ -530,6 +669,7 @@ namespace AHT_Buddy
         }
         #endregion
         #region PoD Operations
+       
 
         private void btnPoDcopy_Click(object sender, RoutedEventArgs e)
         {
@@ -909,10 +1049,13 @@ namespace AHT_Buddy
 
         #endregion
 
+
+
         private void btnEmailCopy_Click(object sender, RoutedEventArgs e)
         {
             TextBox txt = sender as TextBox;
             CopyToClipboard(txt.Text);
+            
         }
         private async void _MessageBox(string msg)
         {
@@ -970,12 +1113,15 @@ namespace AHT_Buddy
             else if (matched && e.Key == VirtualKey.Enter)
             {
                 int lastword = txt.Text.LastIndexOf(GotLastWord);
+                if (lastword <= 0) { lastword = 0; }
           
                 txt.Text = txt.Text.Remove(lastword, GotLastWord.Length).Insert(lastword, InsertWord);
+                e.Handled = true;
+                txt.Text = txt.Text + " ";
                 txt.SelectionStart = txt.Text.Length + 1;
                 popupAR.IsOpen = false;
             }
-            else if (matched && e.Key == VirtualKey.Space)
+            else 
             {
                 popupAR.IsOpen = false;
             }
