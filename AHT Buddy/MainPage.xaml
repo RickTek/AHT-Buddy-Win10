@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     
-    xmlns:Controls="using:Coding4Fun.Toolkit.Controls"
     
-    xmlns:DynamicAutoCompleteTextBox="using:DynamicAutoCompleteTextBox"
+    
+    
     
     xmlns:Controls1="using:AppStudio.Uwp.Controls"
     
@@ -3019,7 +3019,7 @@
                     <TextBox x:Name="tbName" Height="30" Width="262" PlaceholderText="Customer Name" Margin="10,0,0,0" MinHeight="30" MinWidth="200" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="2" VerticalAlignment="Top" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Left"/>
                     <Button x:Name="btnAccountCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="255,0,0,0" VerticalAlignment="Top" Width="50" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B" IsTabStop="False" Grid.Row="4" Grid.ColumnSpan="2"/>
                     <TextBox x:Name="tbAccount" Height="30" Width="Auto" PlaceholderText="Account Number" Margin="10,0,43,0" MinHeight="30" MinWidth="200" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="3" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Row="4"/>
-                    <Button x:Name="btnContactCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="255,0,0,0" VerticalAlignment="Top" Width="50" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B" IsTabStop="False" Grid.Row="5" Grid.ColumnSpan="2"/>
+                    <Button x:Name="btnContactCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="255,0,0,0" VerticalAlignment="Top" Width="50" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B" IsTabStop="False" Grid.Row="5" Grid.ColumnSpan="2" Click="btnContactCopy_Click"/>
                     <TextBox x:Name="tbContact" Height="30" Width="Auto" PlaceholderText="Contact Number" Margin="10,0,43,0" MinHeight="30" MinWidth="200" MaxWidth="295" MaxHeight="30" Padding="5,2" Style="{StaticResource TextBoxStyle1}" TabIndex="4" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Row="5" TextChanged="tbContact_TextChanged"/>
                     <TextBox x:Name="tbAttempt"  Height="30" Margin="215,0,10,0" Style="{StaticResource TextBoxStyle1}" MinHeight="30" MaxHeight="30" MinWidth="90" MaxWidth="90" Padding="5,2" PlaceholderText="Attempt #" TabIndex="6" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Row="6"/>
                     <Button x:Name="btnDeviceCopy" Content="Button" HorizontalAlignment="Left" Height="30" Margin="160,0,0,0" VerticalAlignment="Top" Width="50" Style="{StaticResource ButtonStyle1}" BorderBrush="#FF7A7A7A" Foreground="White" Background="#3300FF8B" IsTabStop="False" Grid.Row="6"/>
@@ -3230,6 +3230,9 @@
                 </PivotItem.Header>
                 <Grid Margin="0,2,0,0">
                     <ListBox x:Name="lbAlarms" Margin="10,10,10,36"  BorderBrush="#FF7A7A7A" BorderThickness="2" Style="{StaticResource ListBoxStyle1}" ItemsSource="{x:Bind alarm}">
+                        <ListBox.DataContext>
+                            <local:Alarm/>
+                        </ListBox.DataContext>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>

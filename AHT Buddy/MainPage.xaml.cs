@@ -60,44 +60,7 @@ namespace AHT_Buddy
     }
     public partial class MainPage : Page
     {
-
-
-
-        #region Auto Replace Dictionary : Class
-        public class AutoReplaceDictionary : ObservableCollection<WordPair>
-        {
-            public AutoReplaceDictionary() : base()
-            {
-
-            }
-
-            internal bool Contains(Func<object, bool> p)
-            {
-                throw new NotImplementedException();
-            }
-        }
-        public class WordPair
-        {
-            private string word;
-            private string replaceword;
-            public string Word
-            {
-                get { return word; }
-                set { word = value; }
-            }
-            public string ReplaceWord
-            {
-                get { return replaceword; }
-                set { replaceword = value; }
-            }
-            public WordPair(string word, string replaceword)
-            {
-                this.word = word;
-                this.replaceword = replaceword;
-
-            }
-        }
-        #endregion             
+        
         #region AutoSuggest List
         public static class SuggestionList
         {
@@ -168,7 +131,7 @@ namespace AHT_Buddy
         public DispatcherTimer clock = new DispatcherTimer();
 
 
-        AutoReplaceDictionary arList = new AutoReplaceDictionary();
+        ObservableCollection<AutoReplaceDictionary> arList = new ObservableCollection<AutoReplaceDictionary>();
         List<string> deviceSuggestion = null;
         List<string> emailSuggestion = null;
         List<string> breaksSuggestion = null;
@@ -186,39 +149,34 @@ namespace AHT_Buddy
 
 
         StorageFolder AHTBuddy = ApplicationData.Current.LocalFolder;
-
-        string Technicolor_file = "Technicolor.txt";
-        string Arris_file = "Arris.txt";
-        string Cisco_file = "Cisco.txt";
-        string Dory_file = "Dory.txt";
-        string SMC_file = "SMC.txt";
-
-
-        string WordList_file = "WordList.dat";
         ApplicationDataContainer AppSettings = ApplicationData.Current.LocalSettings;
-        
 
 
-        Alarm alarm = new Alarm();
+
+        ObservableCollection<Alarm> alarm = new ObservableCollection<Alarm>();
         
         string GotLastWord;
         string InsertWord;
         bool matched;
         int wordcount;
-        int WordPairCount;
         
+        private const string _PoDfile = "PoDs.txt";
+        private const string _WordPairfile = "WordPairs.txt";
 
         public MainPage()
         {
             clock.Tick += Clock_Ticker;
             clock.Interval = new TimeSpan(0, 0, 1);
             clock.Start();
-            AppSettings.Values["WordPairCount"] = WordPairCount;
+            
 
-            Loaded += Page_Loaded;
+            
             this.InitializeComponent();
 
-            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+            
+            
+
+
             comboPC.ItemsSource = code.ProblemCode; //bind problem code dictionary to combobox
             comboPC.DisplayMemberPath = "Value";
             comboPC.SelectedValuePath = "Key";
@@ -232,129 +190,8 @@ namespace AHT_Buddy
 
         }
         #region File Operations
-        
-        async void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)
-        {
-            try
-            {
-                await SaveData(Technicolor_file, tbTechnicolor.Text, false);
-                await SaveData(Arris_file, tbArris.Text, false);
-                await SaveData(Cisco_file, tbCisco.Text, false);
-                await SaveData(Dory_file, tbDory.Text, false);
-                await SaveData(SMC_file, tbSMC.Text, false);
-                await SaveData(WordList_file, string.Empty, true);
-            }
-            catch { }
-            
-            
-        }
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            ApplicationDataContainer AppSettings = ApplicationData.Current.LocalSettings;
-
-            try
-            {
-                await LoadData(WordList_file, true);
-            }
-            catch { }
-            try
-            {
-                tbTechnicolor.Text = await LoadData(Technicolor_file, false);
-                tbArris.Text = await LoadData(Arris_file, false);
-                tbCisco.Text = await LoadData(Cisco_file, false);
-                tbDory.Text = await LoadData(Cisco_file, false);
-                tbSMC.Text = await LoadData(SMC_file, false);
-            }
-            catch
-            {
-
-            }
-            
-        }
-
-        private async Task SaveWordList(AutoReplaceDictionary arlist)
-        {
-            try
-            {
-                StorageFile savedStuffFile =
-                    await ApplicationData.Current.LocalFolder.CreateFileAsync("WordPairs.dat", CreationCollisionOption.ReplaceExisting);
-
-                using (Stream writeStream =
-                    await savedStuffFile.OpenStreamForWriteAsync())
-                {
-                    DataContractSerializer stuffSerializer =
-                        new DataContractSerializer(typeof(AutoReplaceDictionary));
-
-                    stuffSerializer.WriteObject(writeStream, arlist);
-                    await writeStream.FlushAsync();
-                    writeStream.Dispose();
-                }
-                
-            }
-            catch (Exception e)
-            {
-                throw new Exception("ERROR: Cannot save Dictionary Data!", e);
-            }
-        }
-
-
-        private async Task SaveData(string FileName, string TextFile, bool IsList)
-        {
-
-            if (IsList == false)
-            {
-                StorageFile storagefile = await AHTBuddy.CreateFileAsync(FileName, CreationCollisionOption.ReplaceExisting);
-                storagefile = await AHTBuddy.GetFileAsync(FileName);
-                await FileIO.WriteTextAsync(storagefile, TextFile);
-            }
-            else
-            {
-                await SaveWordList(this.arList);
-            }
-          
-        }
-        private async Task<string> LoadData(string FileName, bool IsList)
-        {
-            FileInfo fInfo = new FileInfo(FileName);
-            if (fInfo.Exists)
-            {
-                if (IsList == false)
-                {
-                    StorageFile file = await AHTBuddy.GetFileAsync(FileName);
-
-
-                    return await FileIO.ReadTextAsync(file);
-                }
-                else
-                {
-                    StorageFile file = await AHTBuddy.CreateFileAsync(FileName, CreationCollisionOption.ReplaceExisting);
-
-                    using (var stream = await file.OpenStreamForReadAsync())
-                    {
-                        string text;
-                        using (var reader = new StreamReader(stream))
-                        {
-                            text = await reader.ReadToEndAsync();
-                        }
-                        var wordlist = JsonConvert.DeserializeObject<WordPair>(text);
-                        arList.Add(wordlist);
-                    }
-
-
-                    using (IInputStream inStream = await file.OpenSequentialReadAsync())
-                    {
-                        DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<WordPair>));
-                        var data = (ObservableCollection<WordPair>)serializer.ReadObject(inStream.AsStreamForRead());
-                    }
-                    return string.Empty;
-                }
-            }
-            else
-            {
-                return string.Empty;
-            }
-            
-        }
+       
+   
         #endregion
         #region Clock Operations
         private void Clock_Ticker(object sender, object e)
@@ -638,6 +475,11 @@ namespace AHT_Buddy
 
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
+            
+            
+
+
+
             string _Date = DateTime.Now.ToString("MM/dd/yyyy");
             string chronic;
 
@@ -976,7 +818,17 @@ namespace AHT_Buddy
         }
         private void SetAlarm_Click(object sender, RoutedEventArgs e)
         {
-            alarm.Add(new AlarmInfo(tbAlarmName.Text, DateTime.Parse(tpAlarm.Time.ToString()).ToString("hh:mm tt"), "Off"));
+            
+            alarm.Add(new Alarm()
+            {
+                Name = tbAlarmName.Text,
+                Time = DateTime.Parse(tpAlarm.Time.ToString()).ToString("hh:mm tt"),
+                Armed = true
+            }
+            );   
+
+            
+
 
 
             puAlarmSet.IsOpen = false;
@@ -1000,8 +852,18 @@ namespace AHT_Buddy
             {
                 if (!arList.Any(w => w.Word == tbAddWord.Text))
                 {
-                    arList.Add(new WordPair(tbAddWord.Text, tbAddWordReplacement.Text));
+                    
+                    arList.Add(new AutoReplaceDictionary()
+                    {
+                        Word = tbAddWord.Text,
+                        ReplaceWord = tbAddWordReplacement.Text
+
+                    });
+
+
                     tbAddWord.Text = string.Empty;
+                    tbAddWordReplacement.Text = string.Empty;
+                    
                 }
                 else
                 {
@@ -1210,6 +1072,11 @@ namespace AHT_Buddy
                 }
                 e.Handled = true;
             }
+        }
+
+        private void btnContactCopy_Click(object sender, RoutedEventArgs e)
+        {
+ 
         }
     }
 }

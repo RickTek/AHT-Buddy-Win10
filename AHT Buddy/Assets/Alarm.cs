@@ -9,12 +9,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace AHT_Buddy
 {
-    public class Alarm : System.Collections.ObjectModel.ObservableCollection<AlarmInfo>
+    public class Alarm : INotifyPropertyChanged
     {
-        public Alarm() : base() { }
-    }
-    public class AlarmInfo : INotifyPropertyChanged
-    {
+       
         private string name;
         private string time;
         private bool armed;
@@ -65,15 +62,6 @@ namespace AHT_Buddy
             
         }
     
-
-
-        public AlarmInfo(string Name, string Time, string OnOff)
-        {
-            name = Name;
-            time = Time;
-            onoff = OnOff;
-
-        }
         protected void OnPropertyChanged(string changeName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;

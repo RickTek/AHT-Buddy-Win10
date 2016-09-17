@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AHT_Buddy
 {
+  
+
+
     abstract class WirelessGateways
     {
 
@@ -70,11 +73,11 @@ namespace AHT_Buddy
                 podDay = int.Parse(DateTime.Parse(spod.ElementAt(pos += 1)).ToString("d"));
             }
             else { return true; }
-
+            
             if (CurrentDay - podDay == 0) { return false; }
             else { return true; }
         }
-
+     
         public class technicolor : WirelessGateways
         {
             public string PoD

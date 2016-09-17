@@ -93,17 +93,19 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Alarm.cs" />
+    <Compile Include="Assets\Alarm.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="code.cs" />
-    <Compile Include="CallData.cs" />
+    <Compile Include="Assets\code.cs" />
+    <Compile Include="Assets\CallData.cs" />
+    <Compile Include="Assets\XmlIO.cs" />
+    <Compile Include="AutoReplaceDictionary.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WirelessGateways.cs" />
+    <Compile Include="Assets\WirelessGateways.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
